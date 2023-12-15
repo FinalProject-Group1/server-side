@@ -12,7 +12,16 @@ module.exports = {
       productName: {
         type: Sequelize.STRING
       },
-      category: {
+      price: {
+        type: Sequelize.INTEGER
+      },
+      priceCompare: {
+        type: Sequelize.INTEGER
+      },
+      changed: {
+        type: Sequelize.INTEGER
+      },
+      status: {
         type: Sequelize.STRING
       },
       imageUrl: {
@@ -22,7 +31,16 @@ module.exports = {
         type: Sequelize.STRING
       },
       unit: {
+        type: Sequelize.STRING
+      },
+      risePercentage: {
+        type: Sequelize.STRING
+      },
+      riseDuration: {
         type: Sequelize.INTEGER
+      },
+      decreasePercentage: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
