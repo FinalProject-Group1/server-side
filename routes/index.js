@@ -6,9 +6,10 @@ const error = require('../middlewares/errorHandler')
 
 
 route.post('/login', UserController.login);
-route.get('/user/:id', UserController.getUserId)
 route.use(authentication)
 route.get('/products', ProductController.getProducts)
+route.get('/user/:id', UserController.getUserId)
+route.post('/seller-products', ProductController.sellerAdd)
 
 route.use(error)
 
