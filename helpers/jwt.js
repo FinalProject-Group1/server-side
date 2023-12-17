@@ -5,7 +5,7 @@ const signToken = (payload) => {
   return jwt.sign(payload, secret, { expiresIn: 3600 });
 };
 const verifyToken = (token) => {
-  return jwt.verify(token, secret);
+  return jwt.verify(token, secret, { ignoreExpiration: true });
 };
 
 module.exports = {
