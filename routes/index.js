@@ -1,3 +1,4 @@
+
 const route = require('express').Router()
 const ProductController = require('../controllers/ProductController');
 const SellerProductController = require('../controllers/SellerProductController');
@@ -16,6 +17,7 @@ route.post('/seller-products', authorizationAdd, SellerProductController.sellerA
 route.get('/seller-products/:id', SellerProductController.sellerFindById)
 route.put('/seller-products/:id', authorizationEdit, SellerProductController.sellerEdit)
 
-route.use(error)
 
-module.exports = route; 
+route.use(error);
+
+module.exports = route;
