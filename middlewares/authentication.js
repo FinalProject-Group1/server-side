@@ -5,6 +5,7 @@ async function authentication(req, res, next) {
     if (!req.headers.authorization) throw { name: 'Unauthenticated' };
     let access_token = req.headers.authorization.replace('Bearer ', '');
     let verifyTok = verifyToken(access_token);
+    const currentTime = Math.floor(Date.now() / 1000);
     if (verifyTok.exp && verifyTok.exp < currentTime) {
       throw { name: 'Unauthenticated' };
     }
@@ -14,6 +15,7 @@ async function authentication(req, res, next) {
     req.user = user;
     next();
   } catch (error) {
+  
     next(error);
   }
 }

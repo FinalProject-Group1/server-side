@@ -22,7 +22,7 @@ class SellerProductController{
 
             res.status(201).json(create)
         } catch (error) {
-            
+         
             next(error)
         }
     }
@@ -48,7 +48,7 @@ class SellerProductController{
             // console.log({ProductId, stock, price, SellerId})
             // {ProductId: +ProductId, stock: +stock, price: +price, SellerId}
             let status;
-            if(stock === 0){
+            if(+stock === 0){
                 status = 'inactive'
             }else{
                 status = 'active'
@@ -60,6 +60,22 @@ class SellerProductController{
             res.status(200).json({message: "Update succesfully"})
         } catch (error) {
             
+            next(error)
+        }
+    }
+
+    static async getAllSeller(req, res, next){
+        try {
+            
+            const sellerProducts = await SellerProduct.findAll({
+                include: {
+                    association: 'seller'
+                }
+            });
+
+            res.status(200).json(sellerProducts)
+        } catch (error) {
+            console.log(error, "<< from sellerproduct")
             next(error)
         }
     }

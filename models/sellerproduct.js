@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      SellerProduct.hasMany(models.OrderItem, {foreignKey: "SellerProductId", as: "sellerproduct"})
       SellerProduct.belongsTo(models.User, {foreignKey: 'SellerId', as: 'seller'})
       SellerProduct.belongsTo(models.Product, {foreignKey: 'ProductId', as: 'product'})
     }
@@ -29,7 +30,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       validate: {
         min : 0,
-
         isValid(el, next){
 
           this.getProduct().then(product => {
