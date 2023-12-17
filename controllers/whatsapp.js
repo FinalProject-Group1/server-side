@@ -55,12 +55,11 @@ password: petanisejahtera`
         }
         const hashingPassword = hashPassword(password);
         const newUser = await User.create({ phoneNumber: phoneNumberFormat, password: hashingPassword, role: 'seller' });
-        msg.reply(messageFormat.register);
+        msg.reply(messageFormat.register + 'Selanjutnya anda harus memasukkan nama toko' + messageFormat.nameShop);
         return;
       }
 
       const user = await User.findOne({ where: { phoneNumber: phoneNumberFormat } });
-      console.log(user.shopName);
 
       if (!user) {
         //Pengecekan user apakah user sudah ada di database atau tidak
@@ -96,15 +95,22 @@ password: petanisejahtera`
       if (msg.body == '2') {
         //ambil token di database
 
-        let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicGhvbmVOdW1iZXIiOiI2Mjg1MTYxMzYzOTgxIiwiaWF0IjoxNzAyNzQ3NTYyLCJleHAiOjE3MDI3NTExNjJ9.kbrq-4mQYzjg5yNGfFjGcAzpVCHtgo3WF4bLPtFq_VE';
+        let token = user.token;
         //decoded token
 
+        if (!token) {
+          token = signToken({ id: user.id, phoneNumber: user.phoneNumber, role: user.role });
+          //update token di database
+          await user.update({ token });
+        }
+
         const verifyTok = verifyToken(token);
-        // console.log(verifyTok);
+        //
         const currentTime = Math.floor(Date.now() / 1000);
         if (verifyTok.exp && verifyTok.exp < currentTime) {
-          token = signToken({ id: user.id, phoneNumber: user.phoneNumber });
-          console.log('expired');
+          token = signToken({ id: user.id, phoneNumber: user.phoneNumber, role: user.role });
+          //update token di database
+          await user.update({ token });
           //update token di database
         } else {
           console.log('masih bisa digunakan');
@@ -116,17 +122,22 @@ password: petanisejahtera`
         //Lihat katalog
 
         //ambil token di database
-        let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicGhvbmVOdW1iZXIiOiI2Mjg1MTYxMzYzOTgxIiwiaWF0IjoxNzAyNzQ3NTYyLCJleHAiOjE3MDI3NTExNjJ9.kbrq-4mQYzjg5yNGfFjGcAzpVCHtgo3WF4bLPtFq_VE';
+        let token = user.token;
+
+        if (!token) {
+          token = signToken({ id: user.id, phoneNumber: user.phoneNumber, role: user.role });
+          //update token di database
+          await user.update({ token });
+        }
+
         //decoded token
         const verifyTok = verifyToken(token);
-        console.log(verifyTok);
         const currentTime = Math.floor(Date.now() / 1000);
         //verifyToken
         if (verifyTok.exp && verifyTok.exp < currentTime) {
-          token = signToken({ id: user.id, phoneNumber: user.phoneNumber });
+          token = signToken({ id: user.id, phoneNumber: user.phoneNumber, role: user.role });
           //update token di database
-        } else {
-          console.log('masih bisa digunakan');
+          await user.update({ token });
         }
         msg.reply(`http://localhost:3000/shop/${user.id}/seller-products/:productId?token=${token}`, null, { linkPreview: true });
         //mengirim link yang menuju ke Katalog seller
@@ -135,34 +146,45 @@ password: petanisejahtera`
         // Lihat Daftar produk seller
 
         //ambil token di database
-        let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicGhvbmVOdW1iZXIiOiI2Mjg1MTYxMzYzOTgxIiwiaWF0IjoxNzAyNzQ3NTYyLCJleHAiOjE3MDI3NTExNjJ9.kbrq-4mQYzjg5yNGfFjGcAzpVCHtgo3WF4bLPtFq_VE';
+        let token = user.token;
+
+        if (!token) {
+          token = signToken({ id: user.id, phoneNumber: user.phoneNumber, role: user.role });
+          //update token di database
+          await user.update({ token });
+        }
+
         //decoded token
         const verifyTok = verifyToken(token);
-        console.log(verifyTok);
         const currentTime = Math.floor(Date.now() / 1000);
         //verifyToken
         if (verifyTok.exp && verifyTok.exp < currentTime) {
-          token = signToken({ id: user.id, phoneNumber: user.phoneNumber });
+          token = signToken({ id: user.id, phoneNumber: user.phoneNumber, role: user.role });
           //update token di database
-        } else {
-          console.log('masih bisa digunakan');
+          await user.update({ token });
         }
         msg.reply(`http://localhost:3000/shop/${user.id}/products`, null, { linkPreview: true });
         //mengirim link yang menuju ke Daftar produk seller
         return;
       } else if (msg.body == '5') {
         //ambil token di database
-        let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicGhvbmVOdW1iZXIiOiI2Mjg1MTYxMzYzOTgxIiwiaWF0IjoxNzAyNzQ3NTYyLCJleHAiOjE3MDI3NTExNjJ9.kbrq-4mQYzjg5yNGfFjGcAzpVCHtgo3WF4bLPtFq_VE';
+        let token = user.token;
+
+        if (!token) {
+          token = signToken({ id: user.id, phoneNumber: user.phoneNumber, role: user.role });
+          //update token di database
+          await user.update({ token });
+        }
+
         //decoded token
         const verifyTok = verifyToken(token);
-        console.log(verifyTok);
+
         const currentTime = Math.floor(Date.now() / 1000);
         //verifyToken
         if (verifyTok.exp && verifyTok.exp < currentTime) {
-          token = signToken({ id: user.id, phoneNumber: user.phoneNumber });
+          token = signToken({ id: user.id, phoneNumber: user.phoneNumber, role: user.role });
           //update token di database
-        } else {
-          console.log('masih bisa digunakan');
+          await user.update({ token });
         }
         msg.reply(`http://localhost:3000/invoices?token=${token}`, null, { linkPreview: true });
         //mengirim link yang menuju ke Daftar transaksi seller
