@@ -24,10 +24,15 @@ module.exports = {
         }
       },
       stock: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        defaultValue: 0
       },
       price: {
         type: Sequelize.INTEGER
+      },
+      status: {
+        type: Sequelize.STRING,
+        defaultValue: "inactive"
       },
       createdAt: {
         allowNull: false,

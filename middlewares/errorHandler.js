@@ -8,21 +8,25 @@ function errorHandler(error, req, res, next) {
                 return el.message;
             });
             break;
-        case "NullEmail":
+        case "NullPhoneNumber":
             statCode = 400;
-            message = ["Email is missing"];
+            message = ["Phone Number is missing"];
             break;
         case "NullPassword":
             statCode = 400;
             message = ["Password is missing"];
             break;
+        case "AddError":
+            statCode = 400;
+            message = ["Tidak bisa menambahkan barang yang sudah ada"];
+            break;
         case "NullFile":
             statCode = 400;
             message = ["File is missing"];
             break;
-        case "ErrorEmailorPassword":
+        case "ErrorPhoneorPassword":
             statCode = 401;
-            message = ["Invalid email/password"];
+            message = ["Invalid phonenumber/password"];
             break;
         case "JsonWebTokenError":
             statCode = 401;
