@@ -16,6 +16,10 @@ function errorHandler(error, req, res, next) {
             statCode = 400;
             message = ["Password is missing"];
             break;
+        case "AddError":
+            statCode = 400;
+            message = ["Tidak bisa menambahkan barang yang sudah ada"];
+            break;
         case "NullFile":
             statCode = 400;
             message = ["File is missing"];

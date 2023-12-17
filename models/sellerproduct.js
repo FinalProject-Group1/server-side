@@ -18,8 +18,38 @@ module.exports = (sequelize, DataTypes) => {
   SellerProduct.init({
     ProductId: DataTypes.INTEGER,
     SellerId: DataTypes.INTEGER,
-    stock: DataTypes.INTEGER,
-    price: DataTypes.INTEGER
+    stock: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      validate: {
+        min : 0
+      }
+    },
+    price: {
+      type: DataTypes.INTEGER,
+      validate: {
+        min : 0,
+
+        isValid(el, next){
+
+          this.getProduct().then(product => {
+            // Custom validation logic based on the Product's properties
+            // console.log(product.price, "<<< ini apa")
+            
+            if (el < (product.price - 2000)) return next("Harga Terlalu Murah")
+            if (el > (product.price + 2000)) return next("Harga Terlalu Mahal")
+            
+            next();
+            
+          });
+        }
+
+      }
+    },
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: 'inactive'
+    }
   }, {
     sequelize,
     modelName: 'SellerProduct',

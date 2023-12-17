@@ -33,16 +33,25 @@ class UserController {
     static async getUserId(req, res, next) {
         try {
             const { id } = req.params
-    
+            
             const user = await User.findByPk(id, {
                 include: {
-                    association: 'products'
+                    association: 'products',
+                    include: {
+                        association: 'product'
+                    }
                 }
             })
+    
+            // const user = await User.findByPk(id, {
+            //     include: {
+            //         association: 'products'
+            //     }
+            // })
             
             res.status(200).json(user)
         } catch (error) {
-            console.log(error)
+            
             next(error)
         }
     }
