@@ -1,5 +1,5 @@
 const {SellerProduct} = require('../models');
-async function authorization(req, res, next){
+async function authorizationEdit(req, res, next){
     try {
         const seller = await SellerProduct.findByPk(req.params.id);
         if(!seller) throw ({name: "NotFound"});
@@ -12,4 +12,16 @@ async function authorization(req, res, next){
     }
 }
 
-module.exports = authorization
+async function authorizationAdd(req, res, next){
+    try {
+        if(req.user.role !== 'seller') throw ({name: "Forbidden"})
+        next();
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = {
+    authorizationAdd,
+    authorizationEdit
+}
