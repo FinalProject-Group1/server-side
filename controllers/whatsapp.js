@@ -102,7 +102,6 @@ password: petanisejahtera`
         const verifyTok = verifyToken(token);
         // console.log(verifyTok);
         const currentTime = Math.floor(Date.now() / 1000);
-        console.log(verifyTok.exp, currentTime);
         if (verifyTok.exp && verifyTok.exp < currentTime) {
           token = signToken({ id: user.id, phoneNumber: user.phoneNumber });
           console.log('expired');
