@@ -15,6 +15,12 @@ module.exports = {
       price: {
         type: Sequelize.INTEGER,
       },
+      HET: {
+        type: Sequelize.INTEGER,
+      },
+      HER: {
+        type: Sequelize.INTEGER,
+      },
       priceCompare: {
         type: Sequelize.INTEGER,
       },
@@ -22,6 +28,9 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       status: {
+        type: Sequelize.STRING,
+      },
+      category: {
         type: Sequelize.STRING,
       },
       imageUrl: {

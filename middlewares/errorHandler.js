@@ -24,6 +24,14 @@ function errorHandler(error, req, res, next) {
             statCode = 400;
             message = ["File is missing"];
             break;
+        case "FieldMissing":
+            statCode = 400;
+            message = ["Please fill all the field"];
+            break;
+        case "StockKurang":
+            statCode = 400;
+            message = [error.message];
+            break;
         case "ErrorPhoneorPassword":
             statCode = 401;
             message = ["Invalid phonenumber/password"];

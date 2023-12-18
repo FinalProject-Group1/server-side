@@ -5,9 +5,15 @@ class UserController {
 
   static async registerBuyer(req, res, next){
     try {
-      const { phoneNumber, password } = req.body;
+      const { fullname, phoneNumber, address, password } = req.body;
+      if(!fullname || !phoneNumber || !address || !password) throw ({name: 'FieldMissing'})
+
+      const buyer = await User.create({ fullname, phoneNumber, address, password, role: 'buyer'})  
+
+      res.status(201).json(buyer)
+
     } catch (error) {
-      
+      next(error)
     }
   }
 

@@ -19,9 +19,14 @@ module.exports = (sequelize, DataTypes) => {
   Invoice.init({
     SellerId: DataTypes.INTEGER,
     BuyerId: DataTypes.INTEGER,
-    quantity: DataTypes.INTEGER,
-    orderStatus: DataTypes.STRING,
-    paymentStatus: DataTypes.STRING
+    orderStatus: {
+      type: DataTypes.STRING,
+      defaultValue: "progress"
+    },
+    paymentStatus: {
+      type: DataTypes.STRING,
+      defaultValue: "unpaid"
+    }
   }, {
     sequelize,
     modelName: 'Invoice',
