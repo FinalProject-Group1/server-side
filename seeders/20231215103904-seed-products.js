@@ -5,26 +5,32 @@ const { default: axios } = require('axios');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const { data } = await axios.get('https://infopangan.jakarta.go.id/api/price/lists');
+    // const { data } = await axios.get('https://infopangan.jakarta.go.id/api/price/lists');
 
-    const api = data.data.prices;
-    const products = api.map((el) => {
-      const obj = {
-        productName: el.name,
-        unit: el.unit,
-        price: el.price,
-        priceCompare: el.price_compare,
-        change: el.changed,
-        status: el.status,
-        risePercentage: el.rise_percentage,
-        riseDuration: el.rise_duration,
-        decreasePercentage: el.decrease_percentage,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+    // const api = data.data.prices;
+    // const products = api.map((el) => {
+    //   const obj = {
+    //     productName: el.name,
+    //     unit: el.unit,
+    //     price: el.price,
+    //     priceCompare: el.price_compare,
+    //     HER: (el.price + (el.price * 0.1) + (el.price * 0.05)),
+    //     HET: (el.price + (el.price * 0.1) + (el.price * 0.07)),
+    //     change: el.changed,
+    //     status: el.status,
+    //     risePercentage: el.rise_percentage,
+    //     riseDuration: el.rise_duration,
+    //     decreasePercentage: el.decrease_percentage,
+    //     createdAt: new Date(),
+    //     updatedAt: new Date(),
+    //   };
 
-      return obj;
-    });
+    //   return obj;
+    // });
+    const products = require('../products.json')
+    products.forEach((el) => {
+      el.createdAt = el.updatedAt = new Date();
+    })
     // console.log(products, "<< ini products")
     await queryInterface.bulkInsert('Products', products);
     /**

@@ -36,8 +36,8 @@ module.exports = (sequelize, DataTypes) => {
             // Custom validation logic based on the Product's properties
             // console.log(product.price, "<<< ini apa")
             
-            if (el < (product.price - 2000)) return next("Harga Terlalu Murah")
-            if (el > (product.price + 2000)) return next("Harga Terlalu Mahal")
+            if (el < product.HER) return next("Harga Terlalu Murah")
+            if (el > product.HET) return next("Harga Terlalu Mahal")
             
             next();
             

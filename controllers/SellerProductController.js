@@ -75,7 +75,7 @@ class SellerProductController{
 
             res.status(200).json(sellerProducts)
         } catch (error) {
-            console.log(error, "<< from sellerproduct")
+            
             next(error)
         }
     }
