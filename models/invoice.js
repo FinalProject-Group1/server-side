@@ -33,6 +33,10 @@ module.exports = (sequelize, DataTypes) => {
     OrderId: {
       type: DataTypes.STRING
     },
+    pendingAmount: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
     expiredTransaction: {
       type: DataTypes.DATE
     },

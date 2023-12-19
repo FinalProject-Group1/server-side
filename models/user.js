@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     fullname: DataTypes.STRING,
     phoneNumber: DataTypes.STRING,
     address: DataTypes.STRING,
+    city: DataTypes.STRING,
     token: DataTypes.STRING,
     role: DataTypes.STRING,
     password: DataTypes.STRING,
@@ -31,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'User',
   });
+
   User.beforeCreate((el) => {
     el.password = hashPassword(el.password)
   })

@@ -35,6 +35,9 @@ module.exports = {
       OrderId: {
         type: Sequelize.STRING
       },
+      pendingAmount: {
+        type: Sequelize.INTEGER
+      },
       expiredTransaction: {
         type: Sequelize.DATE
       },

@@ -1,7 +1,7 @@
-const{Invoice, OrderItem, sequelize, SellerProduct, User} = require('../models');
+const { Invoice, OrderItem, sequelize, SellerProduct, User } = require('../models');
 const { Op } = require("sequelize");
-class InvoiceController{
- static async getInvoice(req, res, next){
+class InvoiceController {
+  static async getInvoice(req, res, next) {
     try {
       const { id } = req.params;
       const invoice = await Invoice.findByPk(id, {
@@ -15,7 +15,7 @@ class InvoiceController{
 
       res.status(200).json(invoice);
     } catch (error) {
-      
+
       next(error);
     }
   }
@@ -23,54 +23,55 @@ class InvoiceController{
   static async createInvoice(req, res, next) {
     const t = await sequelize.transaction();
     try {
-        const { SellerId, products } = req.body
-        const BuyerId = req.user.id
-        if(BuyerId === SellerId) throw({name: "SameShop"})
-        const user = await User.findByPk(+SellerId)
-    // console.log(buyer)
-        if(user.role !== 'seller') throw ({name: "NotSeller"})
-        const sellerProducts = await SellerProduct.findAll({where: {
-            [Op.or]: [
-               ...products.map((el) => ({id : el.SellerProductId}))
-              ]
+      const { SellerId, products } = req.body
+      const BuyerId = req.user.id
+      if (BuyerId === SellerId) throw ({ name: "SameShop" })
+      const user = await User.findByPk(+SellerId)
+      // console.log(buyer)
+      if (user.role !== 'seller') throw ({ name: "NotSeller" })
+      const sellerProducts = await SellerProduct.findAll({
+        where: {
+          [Op.or]: [
+            ...products.map((el) => ({ id: el.SellerProductId }))
+          ]
         },
-        include : {
-            association: 'product'
+        include: {
+          association: 'product'
         }
-    })
+      })
 
-        const errors = []
-        sellerProducts.forEach((el) => {
-           
-           const sellerProduct = products.find(product => product.SellerProductId == el.id)
+      const errors = []
+      sellerProducts.forEach((el) => {
+
+        const sellerProduct = products.find(product => product.SellerProductId == el.id)
         //   console.log(el)
-      
-            if(el.stock < sellerProduct.quantity) {
-                errors.push(`Stock ${el.product.productName} tidak mencukupi`)
-            }
-        })
-        if(errors.length > 0) throw({name: "StockKurang", message: errors})
-        
+
+        if (el.stock < sellerProduct.quantity) {
+          errors.push(`Stock ${el.product.productName} tidak mencukupi`)
+        }
+      })
+      if (errors.length > 0) throw ({ name: "StockKurang", message: errors })
 
 
-       
-      const createINV = await Invoice.create({SellerId: +SellerId, BuyerId}, { transaction: t })
+
+
+      const createINV = await Invoice.create({ SellerId: +SellerId, BuyerId }, { transaction: t })
       const newProducts = products.map((el) => {
-            const obj = {
-                ...el,
-                InvoiceId : createINV.id
-            }
-            return obj
-        })
-        // console.log(newProducts)
-       const createOrder = await OrderItem.bulkCreate(newProducts, { transaction: t })
-       await t.commit();
+        const obj = {
+          ...el,
+          InvoiceId: createINV.id
+        }
+        return obj
+      })
+      // console.log(newProducts)
+      const createOrder = await OrderItem.bulkCreate(newProducts, { transaction: t })
+      await t.commit();
 
-        res.status(201).json(createOrder)
+      res.status(201).json(createOrder)
     } catch (error) {
-        await t.rollback();
-        // console.log(error)
-        next(error)
+      await t.rollback();
+      // console.log(error)
+      next(error)
     }
   }
 

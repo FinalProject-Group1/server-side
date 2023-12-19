@@ -40,6 +40,10 @@ function errorHandler(error, req, res, next) {
             statCode = 400;
             message = ["User yang anda tuju bukan penjual"];
             break;
+        case "Expired":
+            statCode = 400;
+            message = ["Transaksi Kadaluarsa"];
+            break;
         case "ErrorPhoneorPassword":
             statCode = 401;
             message = ["Invalid phonenumber/password"];
