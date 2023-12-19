@@ -42,6 +42,11 @@ password: petanisejahtera`
         return;
       } else if (msg.body.startsWith('password:')) {
         // Masukkan password dan masukkan data user ke database
+        // const info = await msg.getInfo();s
+        const contact = await msg.getContact();
+        const profilePic = await client.getProfilePicUrl(contact.id);
+
+        console.log(contact, '<<< ini concsole', profilePic, '<<< ini profilePic');
 
         const password = msg.body.split(' ')[1];
         // pengecekan accountya udah terdaftar atau belum
@@ -285,9 +290,12 @@ contoh: edit 1`);
 class Whatsapp {
   static async sendMessage(noHp, message) {
     try {
-      client.sendMessage(noHp, message);
+      const phoneNumFormat = noHp + '@c.us';
+      await client.sendMessage(noHp, message);
+      return 'success';
     } catch (error) {
       console.log(error);
+      return 'error';
     }
   }
 }

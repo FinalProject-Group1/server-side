@@ -3,24 +3,24 @@ const { Op } = require("sequelize");
 class InvoiceController{
  static async getInvoice(req, res, next){
     try {
-        const {id} = req.params
-        const invoice = await Invoice.findByPk(id, {
-            include: {
-                model: OrderItem,
-                include: {
-                    association: 'sellerproduct'
-                }
-            }
-        })
+      const { id } = req.params;
+      const invoice = await Invoice.findByPk(id, {
+        include: {
+          model: OrderItem,
+          include: {
+            association: 'sellerproduct',
+          },
+        },
+      });
 
-        res.status(200).json(invoice)
+      res.status(200).json(invoice);
     } catch (error) {
-        console.log(error, "<< ini errornya")
-        next(error)
+      
+      next(error);
     }
- }
+  }
 
- static async createInvoice(req, res, next){
+  static async createInvoice(req, res, next) {
     const t = await sequelize.transaction();
     try {
         const { SellerId, products } = req.body
@@ -72,9 +72,23 @@ class InvoiceController{
         // console.log(error)
         next(error)
     }
- }
+  }
 
+  static async editInvoice(req, res, next) {
+    const { orderStatus } = req.body;
+    const { id } = req.params;
+    try {
+      const invoice = await Invoice.findByPk(id);
 
+      if (!invoice) throw { name: 'NotFound' };
+
+      await invoice.update({ orderStatus });
+
+      res.status(200).json({ message: 'Update successfully' });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
-module.exports = InvoiceController
+module.exports = InvoiceController;
