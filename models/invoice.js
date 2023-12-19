@@ -26,7 +26,16 @@ module.exports = (sequelize, DataTypes) => {
     paymentStatus: {
       type: DataTypes.STRING,
       defaultValue: "unpaid"
-    }
+    },
+    transactionToken: {
+      type: DataTypes.STRING
+    },
+    OrderId: {
+      type: DataTypes.STRING
+    },
+    expiredTransaction: {
+      type: DataTypes.DATE
+    },
   }, {
     sequelize,
     modelName: 'Invoice',
