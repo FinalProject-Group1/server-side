@@ -95,6 +95,22 @@ class PaymentGate {
     }
   }
   static async success(req, res, next) {
+    const rupiah = (number) => {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR"
+      }).format(number);
+    }
+    const changeDate = (date) => {
+      const data = new Date(date)
+      const day = data.toLocaleString("ID", { day: '2-digit' })
+      const month = data.toLocaleString("ID", { month: 'long' })
+      const year = data.toLocaleString("ID", { year: 'numeric' })
+
+      const format = `${day} ${month} ${year}`
+
+      return format
+    }
     try {
       console.log(req.body, "<< isi bodynya")
       const { transaction_status, gross_amount, status_code, order_id, expiry_time, transaction_time } = req.body
@@ -127,25 +143,12 @@ class PaymentGate {
       const daftarBelanja = invoice.OrderItems.map((el, index) => {
         return `${index + 1}. ${el.sellerproduct.product.productName}
         - Jumlah: ${el.quantity}
-        - Harga Satuan: ${el.sellerproduct.price}
+        - Harga Satuan: ${rupiah(el.sellerproduct.price)}
+        - Subtotal:  ${rupiah(el.quantity*el.sellerproduct.price)}
           `;
       });
-      const changeDate = (date) => {
-        const data = new Date(date)
-        const day = data.toLocaleString("ID", { day: '2-digit' })
-        const month = data.toLocaleString("ID", { month: 'long' })
-        const year = data.toLocaleString("ID", { year: 'numeric' })
-
-        const format = `${day} ${month} ${year}`
-
-        return format
-      }
-      const rupiah = (number) => {
-        return new Intl.NumberFormat("id-ID", {
-          style: "currency",
-          currency: "IDR"
-        }).format(number);
-      }
+      
+      
       const listProduk = daftarBelanja.join('\r\n');
       if (transaction_status === 'capture') {
         await invoice.update({ paymentStatus: 'paid', pendingAmount: +gross_amount })
@@ -163,7 +166,7 @@ Telepon: ${invoice.buyer.phoneNumber}
 📦 Daftar Barang:
          
 ${listProduk}
-ongkir = 9000
+Ongkos kirim: ${rupiah(9000)}
       
 💲 Total Harga: ${rupiah(+gross_amount)}
       

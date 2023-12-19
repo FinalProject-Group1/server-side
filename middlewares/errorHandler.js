@@ -44,6 +44,10 @@ function errorHandler(error, req, res, next) {
             statCode = 400;
             message = ["Transaksi Kadaluarsa"];
             break;
+        case "HoldAmount":
+            statCode = 400;
+            message = ["Transaksi Belum diselesaikan"];
+            break;
         case "ErrorPhoneorPassword":
             statCode = 401;
             message = ["Invalid phonenumber/password"];
