@@ -35,6 +35,7 @@ class SellerProductController {
 
 	static async sellerFindById(req, res, next) {
 		try {
+			const {id} = req.params
 			const sellerProduct = await SellerProduct.findByPk(id);
 
 			res.status(200).json(sellerProduct);

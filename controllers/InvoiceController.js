@@ -6,12 +6,21 @@ class InvoiceController {
     try {
       const { id } = req.params;
       const invoice = await Invoice.findByPk(id, {
-        include: {
+        include: [{
           model: OrderItem,
           include: {
             association: 'sellerproduct',
+            include: {
+              association: 'product'
+            }
+          }
           },
-        },
+          {
+            include: {
+              association: 'buyer'
+            }
+          }
+        ],
       });
 
       res.status(200).json(invoice);
@@ -156,6 +165,8 @@ Dana Sebesar ${rupiah(temp)} telah masuk ke dalam rekeningmu`
       next(error);
     }
   }
+
+
 
 }
 
