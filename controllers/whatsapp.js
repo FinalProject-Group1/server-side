@@ -110,7 +110,7 @@ password: petanisejahtera`
         return;
       }
 
-      if (user.address === null) {
+      if (user.city === null) {
         client.sendMessage(msg.id.remote, messageFormat.address);
         return;
       }
