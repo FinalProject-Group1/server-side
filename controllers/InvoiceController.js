@@ -75,21 +75,48 @@ class InvoiceController {
     }
   }
 
-  static async editInvoice(req, res, next) {
-    const { orderStatus } = req.body;
-    const { id } = req.params;
+  static async editInvoiceBuyer(req, res, next) {
+    const { InvoiceId } = req.body;
     try {
-      const invoice = await Invoice.findByPk(id);
+      const invoice = await Invoice.findByPk(+InvoiceId, {
+        include: {
+          association: 'seller'
+        }
+      });
 
       if (!invoice) throw { name: 'NotFound' };
 
-      await invoice.update({ orderStatus });
+      await invoice.update({ orderStatus: 'done' });
+      const amount = invoice.pendingAmount
+      const result = +amount - (Number(amount)*0.1)
+      
+      const paid = await invoice.seller.update({saldo: result})
+      if(!paid) throw ({name: "HoldAmount"})
 
-      res.status(200).json({ message: 'Update successfully' });
+      await invoice.update({pendingAmount: 0})
+
+      res.status(200).json({ message: 'Orderan Diselesaikan' });
     } catch (error) {
       next(error);
     }
   }
+
+  static async editInvoiceSeller(req, res, next) {
+    const { InvoiceId } = req.body;
+    try {
+      const invoice = await Invoice.findByPk(+InvoiceId);
+
+      if (!invoice) throw { name: 'NotFound' };
+
+      await invoice.update({ orderStatus: 'Shipment' });
+
+
+      res.status(200).json({ message: 'Orderan dalam pengiriman' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 module.exports = InvoiceController;
