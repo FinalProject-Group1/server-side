@@ -43,10 +43,6 @@ password: petanisejahtera`
       } else if (msg.body.startsWith('password:')) {
         // Masukkan password dan masukkan data user ke database
         // const info = await msg.getInfo();s
-        const contact = await msg.getContact();
-        const profilePic = await client.getProfilePicUrl(contact.id);
-
-        console.log(contact, '<<< ini concsole', profilePic, '<<< ini profilePic');
 
         const password = msg.body.split(' ')[1];
         // pengecekan accountya udah terdaftar atau belum
@@ -139,7 +135,14 @@ password: petanisejahtera`
           await user.update({ token });
           //update token di database
         }
-        msg.reply(`http://localhost:3000/shop/${user.id}/add-products?token=${token}`, null, { linkPreview: true });
+        msg.reply(
+          `*Klik link dibawah ini untuk menambahkan produk*
+
+http://localhost:3000/shop/${user.id}/add-products?token=${token}
+`,
+          null,
+          { linkPreview: true }
+        );
         //mengirim link yang menuju ke tambah produk si seller
         return;
       } else if (msg.body == '3') {
@@ -164,7 +167,13 @@ password: petanisejahtera`
           await user.update({ token });
         }
 
-        msg.reply(`http://localhost:3000/shop/${user.id}/seller-products?token=${token}`, null, { linkPreview: true });
+        msg.reply(
+          ` *Klik link dibawah ini untuk melihat katalog produk*
+
+http://localhost:3000/shop/${user.id}/seller-products?token=${token}`,
+          null,
+          { linkPreview: true }
+        );
         //mengirim link yang menuju ke Katalog seller
         return;
       } else if (msg.body == '4') {
@@ -238,7 +247,13 @@ contoh: edit 1`);
           //update token di database
           await user.update({ token });
         }
-        msg.reply(`http://localhost:3000/invoices?token=${token}`, null, { linkPreview: true });
+        msg.reply(
+          `Klik link dibawah ini untuk melihat daftar transaksi yang anda miliki
+
+http://localhost:3000/invoices?token=${token}`,
+          null,
+          { linkPreview: true }
+        );
         //mengirim link yang menuju ke Daftar transaksi seller
         return;
       }
@@ -276,7 +291,13 @@ contoh: edit 1`);
 
         const productId = userWithProducts.products[+index - 1].id;
 
-        msg.reply(`http://localhost:3000/shop/${user.id}/seller-products/${productId}?token=${token}`, null, { linkPreview: true });
+        msg.reply(
+          ` Klik link di bawah ini untuk mengedit product ${userWithProducts.products[+index - 1].product.productName}
+
+http://localhost:3000/shop/${user.id}/seller-products/${productId}?token=${token}`,
+          null,
+          { linkPreview: true }
+        );
         return;
       }
 
@@ -291,7 +312,8 @@ class Whatsapp {
   static async sendMessage(noHp, message) {
     try {
       const phoneNumFormat = noHp + '@c.us';
-      await client.sendMessage(noHp, message);
+      console.log(phoneNumFormat)
+      await client.sendMessage(phoneNumFormat, message);
       return 'success';
     } catch (error) {
       console.log(error);

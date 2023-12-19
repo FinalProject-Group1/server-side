@@ -2,18 +2,17 @@ const { comparePassword } = require('../helpers/bcrypt');
 const { signToken, verifyToken } = require('../helpers/jwt');
 const { User } = require('../models');
 class UserController {
-
-  static async registerBuyer(req, res, next){
+  static async registerBuyer(req, res, next) {
     try {
+      console.log('masuk ga');
       const { fullname, phoneNumber, address, password } = req.body;
-      if(!fullname || !phoneNumber || !address || !password) throw ({name: 'FieldMissing'})
+      if (!fullname || !phoneNumber || !address || !password) throw { name: 'FieldMissing' };
 
-      const buyer = await User.create({ fullname, phoneNumber, address, password, role: 'buyer'})  
+      const buyer = await User.create({ fullname, phoneNumber, address, password, role: 'buyer' });
 
-      res.status(201).json(buyer)
-
+      res.status(201).json(buyer);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
@@ -50,7 +49,6 @@ class UserController {
 
       res.status(200).json({ access_token: token });
     } catch (error) {
-      
       next(error);
     }
   }
@@ -76,19 +74,16 @@ class UserController {
 
       res.status(200).json(user);
     } catch (error) {
-      
       next(error);
     }
   }
   static async profile(req, res, next) {
     try {
-      const phoneNumber = req.user.phoneNumber
-      const user = await User.findOne({attributes: ['id','fullname','phoneNumber', 'address'] ,where: {phoneNumber}});
-
+      const phoneNumber = req.user.phoneNumber;
+      const user = await User.findOne({ attributes: ['id', 'fullname', 'phoneNumber', 'address'], where: { phoneNumber } });
 
       res.status(200).json(user);
     } catch (error) {
-
       next(error);
     }
   }
