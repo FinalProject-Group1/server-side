@@ -30,7 +30,19 @@ function errorHandler(error, req, res, next) {
             break;
         case "StockKurang":
             statCode = 400;
-            message = [error.message];
+            message = error.message ? error.message : "Stocknya Kurang Bro!!!";
+            break;
+        case "SameShop":
+            statCode = 400;
+            message = ["Tidak bisa membeli barang di tempat yang sama"];
+            break;
+        case "NotSeller":
+            statCode = 400;
+            message = ["User yang anda tuju bukan penjual"];
+            break;
+        case "Expired":
+            statCode = 400;
+            message = ["Transaksi Kadaluarsa"];
             break;
         case "ErrorPhoneorPassword":
             statCode = 401;
