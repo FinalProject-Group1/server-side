@@ -73,11 +73,11 @@ class PaymentGate {
         ]
 
       };
-      if (invoice.transactionToken > (new Date())) {
-        await invoice.update({ orderStatus: "cancel" })
-      }
+      // if (invoice.expiredTransaction < (new Date())) {
+      //   await invoice.update({ orderStatus: "cancel" })
+      // }
 
-      if (invoice.orderStatus === 'cancel') throw ({ name: 'Expired' })
+      // if (invoice.orderStatus === 'cancel') throw ({ name: 'Expired' })
 
       if (!invoice.transactionToken) {
         const transaction = await snap.createTransaction(parameter)
@@ -112,7 +112,7 @@ class PaymentGate {
       return format
     }
     try {
-      console.log(req.body, "<< isi bodynya")
+      // console.log(req.body, "<< isi bodynya")
       const { transaction_status, gross_amount, status_code, order_id, expiry_time, transaction_time } = req.body
       const stat = order_id.split('-')[1]
       // console.log(pk)
@@ -142,7 +142,7 @@ class PaymentGate {
 
       const daftarBelanja = invoice.OrderItems.map((el, index) => {
         return `${index + 1}. ${el.sellerproduct.product.productName}
-        - Jumlah: ${el.quantity}
+        - Jumlah: ${el.quantity} ${el.sellerproduct.product.unit}
         - Harga Satuan: ${rupiah(el.sellerproduct.price)}
         - Subtotal:  ${rupiah(el.quantity*el.sellerproduct.price)}
           `;
@@ -174,13 +174,17 @@ Ongkos kirim: ${rupiah(9000)}
       
 💰 Status Pembayaran: Sudah Dibayar
       
-🚚 Status Pengiriman: Belum Dikirim`
+🚚 Status Pengiriman: Belum Dikirim
+
+klik link di bawah ini untuk mengubah status orderanmu
+
+${process.env.BASE_URL_CLIENT}/transaction/${invoice.id}?token=${invoice.seller.token}`
 
        await Whatsapp.sendMessage(invoice.seller.phoneNumber, message)
 
         res.status(+status_code).json('Payment Succesfull')
       } else if (transaction_status === 'pending') {
-        await invoice.update({ transactionToken: expiry_time })
+        await invoice.update({ expiredTransaction: expiry_time })
 
         res.status(+status_code).json('Payment Pending')
       }

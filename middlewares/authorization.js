@@ -21,7 +21,17 @@ async function authorizationAdd(req, res, next){
     }
 }
 
+async function authorizationBuyer(req, res, next){
+    try {
+        if(req.user.role !== 'buyer') throw ({name: "Forbidden"})
+        next();
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     authorizationAdd,
-    authorizationEdit
+    authorizationEdit,
+    authorizationBuyer
 }
