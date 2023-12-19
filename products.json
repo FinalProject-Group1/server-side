@@ -11,7 +11,8 @@
     "category": "sembako",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "249.164"
+    "decreasePercentage": "249.164",
+    "imageUrl": "https://images.unsplash.com/photo-1613758235256-43a7bdc21d82"
   },
   {
     "productName": "Beras IR. II (IR 64) Ramos",
@@ -25,7 +26,8 @@
     "category": "sembako",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1613758235256-43a7bdc21d82"
   },
   {
     "productName": "Beras IR. III (IR 64)",
@@ -39,7 +41,8 @@
     "category": "sembako",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1613758235256-43a7bdc21d82"
   },
   {
     "productName": "Beras Muncul .I",
@@ -53,7 +56,8 @@
     "category": "sembako",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "346.945"
+    "decreasePercentage": "346.945",
+    "imageUrl": "https://images.unsplash.com/photo-1613758235256-43a7bdc21d82"
   },
   {
     "productName": "Beras IR 42/Pera",
@@ -67,7 +71,8 @@
     "category": "sembako",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1613758235256-43a7bdc21d82"
   },
   {
     "productName": "Beras Setra I/Premium",
@@ -81,7 +86,8 @@
     "category": "sembako",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1613758235256-43a7bdc21d82"
   },
   {
     "productName": "Minyak Goreng (Kuning/Curah)",
@@ -95,7 +101,8 @@
     "category": "sembako",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1552592074-ea7a91b851b3"
   },
   {
     "productName": "Cabe Merah Keriting",
@@ -109,7 +116,8 @@
     "category": "sayuran",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "7799.142"
+    "decreasePercentage": "7799.142",
+    "imageUrl": "https://images.unsplash.com/photo-1546860255-95536c19724e"
   },
   {
     "productName": "Cabe Merah Besar (TW)",
@@ -123,7 +131,8 @@
     "category": "sayuran",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "8345.924"
+    "decreasePercentage": "8345.924",
+    "imageUrl": "https://images.unsplash.com/photo-1546860255-95536c19724e"
   },
   {
     "productName": "Cabe Rawit Merah",
@@ -137,7 +146,8 @@
     "category": "sayuran",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1546860255-95536c19724e"
   },
   {
     "productName": "Cabe Rawit Hijau",
@@ -151,7 +161,8 @@
     "category": "sayuran",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1597115580039-b849ed2d6398"
   },
   {
     "productName": "Bawang Merah",
@@ -165,7 +176,8 @@
     "category": "sayuran",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "5781.267"
+    "decreasePercentage": "5781.267",
+    "imageUrl": "https://images.unsplash.com/photo-1565685225009-fc85d9109c80"
   },
   {
     "productName": "Bawang Putih",
@@ -179,7 +191,8 @@
     "category": "sayuran",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1526215441679-65290591ff57"
   },
   {
     "productName": "Ayam Broiler/Ras",
@@ -193,7 +206,8 @@
     "category": "daging",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "1609.732"
+    "decreasePercentage": "1609.732",
+    "imageUrl": "https://images.unsplash.com/photo-1589922583749-6b8473a85048"
   },
   {
     "productName": "Telur Ayam Ras",
@@ -207,7 +221,8 @@
     "category": "sembako",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1639194335563-d56b83f0060c"
   },
   {
     "productName": "Gula Pasir",
@@ -221,7 +236,8 @@
     "category": "sembako",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1621534416159-42d19eb5ed0b"
   },
   {
     "productName": "Tepung Terigu",
@@ -235,7 +251,8 @@
     "category": "sembako",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1565607052745-35f8c6ba59b1"
   },
   {
     "productName": "Garam Dapur",
@@ -249,7 +266,8 @@
     "category": "sembako",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1630501439385-a55dada3f46b"
   },
   {
     "productName": "Kentang (sedang)",
@@ -263,7 +281,8 @@
     "category": "sayuran",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1590165482129-1b8b27698780"
   },
   {
     "productName": "Tomat Buah",
@@ -277,7 +296,8 @@
     "category": "sayuran",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1582284540020-8acbe03f4924"
   },
   {
     "productName": "Kelapa Kupas",
@@ -291,7 +311,8 @@
     "category": "buah",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1603779046675-2eccbab9b982"
   },
   {
     "productName": "Semangka",
@@ -305,7 +326,8 @@
     "category": "buah",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1621961048737-a9993789e1ad"
   },
   {
     "productName": "Jeruk Medan",
@@ -319,7 +341,8 @@
     "category": "buah",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b"
   },
   {
     "productName": "Daging Sapi Has (Paha Belakang)",
@@ -333,7 +356,8 @@
     "category": "daging",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "247.830"
+    "decreasePercentage": "247.830",
+    "imageUrl": "https://images.unsplash.com/photo-1560781290-7dc94c0f8f4f"
   },
   {
     "productName": "Daging Sapi Murni (Semur)",
@@ -347,7 +371,8 @@
     "category": "daging",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "5477.219"
+    "decreasePercentage": "5477.219",
+    "imageUrl": "https://images.unsplash.com/photo-1560781290-7dc94c0f8f4f"
   },
   {
     "productName": "Daging Kambing",
@@ -361,7 +386,8 @@
     "category": "daging",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1560781290-7dc94c0f8f4f"
   },
   {
     "productName": "Ikan Bandeng (sedang)",
@@ -375,7 +401,8 @@
     "category": "daging",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1510130387422-82bed34b37e9"
   },
   {
     "productName": "Ikan Mas",
@@ -389,7 +416,8 @@
     "category": "daging",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1510130387422-82bed34b37e9"
   },
   {
     "productName": "Ikan Lele",
@@ -403,6 +431,7 @@
     "category": "daging",
     "risePercentage": "0%",
     "riseDuration": 0,
-    "decreasePercentage": "0.000"
+    "decreasePercentage": "0.000",
+    "imageUrl": "https://images.unsplash.com/photo-1605493725784-585f8d90fe82"
   }
 ]
