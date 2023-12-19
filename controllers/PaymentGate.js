@@ -73,20 +73,27 @@ class PaymentGate {
         ]
 
       };
-      // if (invoice.expiredTransaction < (new Date())) {
-      //   await invoice.update({ orderStatus: "cancel" })
-      // }
+      let currentTime = new Date();
+      let expiredLink = currentTime.setDate(currentTime.getDate() + 1);
+      let tomorrow = new Date(expiredLink) 
 
-      // if (invoice.orderStatus === 'cancel') throw ({ name: 'Expired' })
+      await invoice.update({expiredTransaction: tomorrow});
+
+      if (invoice.expiredTransaction < currentTime && invoice.orderStatus === 'progress') {
+        await invoice.update({ orderStatus: "cancel" });
+      }
+
+      if (invoice.orderStatus === 'cancel') throw ({ name: 'Expired' });
+      if (invoice.orderStatus === 'done') throw ({ name: 'OnDone' });
 
       if (!invoice.transactionToken) {
-        const transaction = await snap.createTransaction(parameter)
-        await invoice.update({ transactionToken: transaction.token, OrderId: orderId })
+        const transaction = await snap.createTransaction(parameter);
+        await invoice.update({ transactionToken: transaction.token, OrderId: orderId });
 
-        res.json({ transaction_token: transaction.token, orderId })
+        res.json({ transaction_token: transaction.token, orderId });
         console.log(transaction)
       } else {
-        res.json({ transaction_token: invoice.transactionToken, orderId: invoice.OrderId })
+        res.json({ transaction_token: invoice.transactionToken, orderId: invoice.OrderId });
       }
 
     } catch (error) {
@@ -112,7 +119,7 @@ class PaymentGate {
       return format
     }
     try {
-      // console.log(req.body, "<< isi bodynya")
+      console.log(req.body, "<< isi bodynya")
       const { transaction_status, gross_amount, status_code, order_id, expiry_time, transaction_time } = req.body
       const stat = order_id.split('-')[1]
       // console.log(pk)
@@ -177,6 +184,8 @@ Ongkos kirim: ${rupiah(9000)}
 🚚 Status Pengiriman: Belum Dikirim
 
 klik link di bawah ini untuk mengubah status orderanmu
+         |  |  |
+        V V V
 
 ${process.env.BASE_URL_CLIENT}/transaction/${invoice.id}?token=${invoice.seller.token}`
 

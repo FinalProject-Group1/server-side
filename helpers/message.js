@@ -14,9 +14,9 @@ contoh : 2`,
   nameShop: `Masukkan nama toko anda dengan format nama_toko: <nama toko anda>
 contoh: 
 nama_toko: Petani Maju`,
-  address: `Masukkan alamat anda dengan format alamat: <alamat anda>
+  address: `Masukkan alamat kota anda dengan format kota: <kota anda>
 contoh: 
-alamat: Bandung`,
+kota: Jakarta`,
 };
 
 module.exports = messageFormat;
