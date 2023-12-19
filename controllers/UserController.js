@@ -1,6 +1,6 @@
 const { comparePassword } = require('../helpers/bcrypt');
 const { signToken, verifyToken } = require('../helpers/jwt');
-const { User } = require('../models');
+const { User, OrderItem } = require('../models');
 class UserController {
 
   static async registerBuyer(req, res, next){
@@ -92,6 +92,61 @@ class UserController {
       next(error);
     }
   }
+
+  static async sellerInvoice(req, res, next) {
+    try {
+      const id = req.user.id
+      const user = await User.findByPk(id, {
+        include: {
+          association: 'seller',
+          include: {
+            model: OrderItem,
+            include: {
+              association: 'sellerproduct',
+              include: {
+                association: 'product'
+              }
+            }
+          }
+        }
+      });
+
+
+      res.status(200).json(user);
+    } catch (error) {
+
+      next(error);
+    }
+  }
+
+  static async buyerInvoice(req, res, next) {
+    try {
+      const id = req.user.id
+      const user = await User.findByPk(id, {
+        include: {
+          association: 'buyer',
+          include: {
+            model: OrderItem,
+            include: {
+              association: 'sellerproduct',
+              include: {
+                association: 'product'
+              }
+            }
+          }
+        }
+      });
+
+
+      res.status(200).json(user);
+    } catch (error) {
+
+      next(error);
+    }
+  }
+
+  
+
 }
 
 module.exports = UserController;

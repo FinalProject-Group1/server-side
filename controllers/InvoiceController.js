@@ -1,16 +1,26 @@
 const { Invoice, OrderItem, sequelize, SellerProduct, User } = require('../models');
 const { Op } = require("sequelize");
+const { Whatsapp } = require('./whatsapp');
 class InvoiceController {
   static async getInvoice(req, res, next) {
     try {
       const { id } = req.params;
       const invoice = await Invoice.findByPk(id, {
-        include: {
+        include: [{
           model: OrderItem,
           include: {
             association: 'sellerproduct',
+            include: {
+              association: 'product'
+            }
+          }
           },
-        },
+          {
+            include: {
+              association: 'buyer'
+            }
+          }
+        ],
       });
 
       res.status(200).json(invoice);
@@ -76,11 +86,25 @@ class InvoiceController {
   }
 
   static async editInvoiceBuyer(req, res, next) {
-    const { InvoiceId } = req.body;
+    const rupiah = (number) => {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR"
+      }).format(number);
+    }
     try {
-      const invoice = await Invoice.findByPk(+InvoiceId, {
+      const { SellerId, InvoiceId } = req.body
+      const BuyerId = req.user.id
+      const invoice = await Invoice.findOne({
         include: {
           association: 'seller'
+        },
+        where: {
+          [Op.and]: [
+            { SellerId: +SellerId },
+            { BuyerId },
+            { id: +InvoiceId }
+          ]
         }
       });
 
@@ -88,12 +112,23 @@ class InvoiceController {
 
       await invoice.update({ orderStatus: 'done' });
       const amount = invoice.pendingAmount
-      const result = +amount - (Number(amount)*0.1)
-      
-      const paid = await invoice.seller.update({saldo: result})
-      if(!paid) throw ({name: "HoldAmount"})
+      const temp = ((+amount) - 9000)
+  
 
-      await invoice.update({pendingAmount: 0})
+
+      if (!invoice.seller.saldo) {
+        await invoice.seller.update({ saldo: temp })
+
+      } else {
+        await invoice.seller.update({ saldo: (invoice.seller.saldo + temp) })
+      }
+      const message = `Notifikasi Order ${invoice.OrderId} Selesai
+Dana Sebesar ${rupiah(temp)} telah masuk ke dalam rekeningmu`
+      Whatsapp.sendMessage(invoice.seller.phoneNumber, message)
+
+
+
+      await invoice.update({ pendingAmount: 0 })
 
       res.status(200).json({ message: 'Orderan Diselesaikan' });
     } catch (error) {
@@ -102,9 +137,22 @@ class InvoiceController {
   }
 
   static async editInvoiceSeller(req, res, next) {
-    const { InvoiceId } = req.body;
     try {
-      const invoice = await Invoice.findByPk(+InvoiceId);
+      const { BuyerId, InvoiceId } = req.body
+      const SellerId = req.user.id;
+      const invoice = await Invoice.findOne({
+        include: {
+          association: 'seller'
+        },
+        where: {
+          [Op.and]: [
+            { SellerId },
+            { BuyerId: +BuyerId },
+            { id: +InvoiceId }
+          ],
+
+        }
+      });
 
       if (!invoice) throw { name: 'NotFound' };
 
@@ -113,9 +161,12 @@ class InvoiceController {
 
       res.status(200).json({ message: 'Orderan dalam pengiriman' });
     } catch (error) {
+      console.log(error, "<< ini error")
       next(error);
     }
   }
+
+
 
 }
 
