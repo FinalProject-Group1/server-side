@@ -92,6 +92,7 @@ class InvoiceController {
         currency: "IDR"
       }).format(number);
     }
+    const t = await sequelize.transaction();
     try {
       const { SellerId, InvoiceId } = req.body
       const BuyerId = req.user.id
@@ -109,41 +110,62 @@ class InvoiceController {
       });
 
       if (!invoice) throw { name: 'NotFound' };
+      if(invoice.orderStatus === 'done') throw ({name: "OnDone"})
+      if(invoice.orderStatus !== 'shipment') throw ({name: "OnShipping"})
 
-      await invoice.update({ orderStatus: 'done' });
+      await invoice.update({ orderStatus: 'done' }, {transaction: t});
       const amount = invoice.pendingAmount
       const temp = ((+amount) - 9000)
   
 
 
       if (!invoice.seller.saldo) {
-        await invoice.seller.update({ saldo: temp })
+        await invoice.seller.update({ saldo: temp }, {transaction: t})
 
       } else {
-        await invoice.seller.update({ saldo: (invoice.seller.saldo + temp) })
+        await invoice.seller.update({ saldo: (invoice.seller.saldo + temp)}, {transaction: t})
       }
-      const message = `Notifikasi Order ${invoice.OrderId} Selesai
+      
+
+
+
+      await invoice.update({ pendingAmount: 0 }, {transaction: t})
+      await t.commit();
+      const message = `Notifikasi Order Selesai
+
+Orderan dengan
+id : ${invoice.OrderId}
+Telah selesai
+      
 Dana Sebesar ${rupiah(temp)} telah masuk ke dalam rekeningmu`
       Whatsapp.sendMessage(invoice.seller.phoneNumber, message)
 
-
-
-      await invoice.update({ pendingAmount: 0 })
-
       res.status(200).json({ message: 'Orderan Diselesaikan' });
     } catch (error) {
+      await t.rollback();
       next(error);
     }
   }
 
   static async editInvoiceSeller(req, res, next) {
+    const t = await sequelize.transaction();
     try {
       const { BuyerId, InvoiceId } = req.body
       const SellerId = req.user.id;
       const invoice = await Invoice.findOne({
-        include: {
+        include: [{
           association: 'seller'
         },
+        {
+          model: OrderItem,
+          include: {
+            association: 'sellerproduct',
+            include: {
+              association: 'product'
+            }
+          }
+        }
+      ],
         where: {
           [Op.and]: [
             { SellerId },
@@ -155,13 +177,41 @@ Dana Sebesar ${rupiah(temp)} telah masuk ke dalam rekeningmu`
       });
 
       if (!invoice) throw { name: 'NotFound' };
+      // console.log(invoice.OrderItems, "<< ini order items")
+      if(invoice.orderStatus === 'shipment') throw ({name: "OnShipment"})
+      const updatingStock = await Promise.all(invoice.OrderItems.map(async (el) => {
+        if (el.SellerProductId === el.sellerproduct.id) {
+          el.sellerproduct.stock = el.sellerproduct.stock - el.quantity;
+      
+          await SellerProduct.update(
+            { stock: el.sellerproduct.stock },
+            { where: { id: el.sellerproduct.id }},
+            {transaction: t} 
+          );
+      
+          
+        }
+        return el.sellerproduct.stock;
+      }));
+      if(!updatingStock) throw({name: "NotYet"})
 
-      await invoice.update({ orderStatus: 'Shipment' });
+      await invoice.update({ orderStatus: 'shipment' }, {transaction: t});
+      
+      await t.commit();
 
+      const message = `Notifikasi Order Selesai
+
+Orderan dengan
+id : ${invoice.OrderId}
+🚚 Status Pengiriman: Dalam Perjalanan
+      
+Pastikan apabila telah menerima paket maka untuk cek terlebih dahulu`
+      Whatsapp.sendMessage(invoice.buyer.phoneNumber, message)
 
       res.status(200).json({ message: 'Orderan dalam pengiriman' });
     } catch (error) {
-      console.log(error, "<< ini error")
+      // console.log(error, "<< ini error")
+      await t.rollback();
       next(error);
     }
   }

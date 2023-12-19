@@ -90,16 +90,23 @@ password: petanisejahtera`
         //Pembuatan Alamat ketika si seller belum menambahkan Alamat
         //NOTE: Toko hanya bisa dibuat ketika seller register dan tidak bisa diubah kembali ketika si seller memasukkan command yang sama
 
-        const address = msg.body.replace('kota: ', '');
+        const city = msg.body.replace('kota: ', '');
         if (user.city && user.city !== null) {
           msg.reply(`*Anda sudah memiliki alamat kota di ${user.address} dan tidak bisa menggantinya lagi*` + messageFormat.listCommand);
+          return;
+        }
+
+        const cityAvailable = 'Jakarta';
+
+        if (city.toLowerCase() !== cityAvailable.toLowerCase()) {
+          msg.reply(`Mohon maaf untuk sekarang aplikasi kami baru tersedia untuk daerah Provinsi Jakarta`);
           return;
         }
 
         //melakukan perubahan Alamat
         user.update({ city });
 
-        client.sendMessage(msg.id.remote, `Alamat ${address} telah ditambahkan pada akun anda` + messageFormat.listCommand);
+        client.sendMessage(msg.id.remote, `Alamat ${city} telah ditambahkan pada akun anda` + messageFormat.listCommand);
         return;
       }
 
@@ -110,7 +117,7 @@ password: petanisejahtera`
         return;
       }
 
-      if (user.address === null) {
+      if (user.city === null) {
         client.sendMessage(msg.id.remote, messageFormat.address);
         return;
       }
@@ -292,8 +299,9 @@ ${url}/invoices?token=${token}`,
 
         const productId = userWithProducts.products[+index - 1].id;
 
+        
         msg.reply(
-          `*Klik link di bawah ini untuk melakukan edit pada produk ${userWithProducts.products.product}*
+          `*Klik link di bawah ini untuk melakukan edit pada produk ${userWithProducts.products[+index - 1].product.productName}*
         
 ${url}/shop/${user.id}/seller-products/${productId}?token=${token}`,
           null,

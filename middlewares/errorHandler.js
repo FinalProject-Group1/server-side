@@ -28,6 +28,18 @@ function errorHandler(error, req, res, next) {
             statCode = 400;
             message = ["Please fill all the field"];
             break;
+        case "OnShipment":
+            statCode = 400;
+            message = ["Pesanan sudah dalam perjalanan"];
+            break;
+        case "OnShipping":
+            statCode = 400;
+            message = ["Pesanan belum diantar"];
+            break;
+        case "OnDone":
+            statCode = 400;
+            message = ["Transaksi telah selesai mohon segera periksa"];
+            break;
         case "StockKurang":
             statCode = 400;
             message = error.message ? error.message : "Stocknya Kurang Bro!!!";
@@ -43,6 +55,10 @@ function errorHandler(error, req, res, next) {
         case "Expired":
             statCode = 400;
             message = ["Transaksi Kadaluarsa"];
+            break;
+        case "Done":
+            statCode = 400;
+            message = ["Transaksi sudah selesai"];
             break;
         case "HoldAmount":
             statCode = 400;
