@@ -328,7 +328,12 @@ class Whatsapp {
   static async sendMessage(noHp, message) {
     try {
       const phoneNumFormat = noHp + '@c.us';
-      await client.sendMessage(phoneNumFormat, message, {linkPreview: true});
+      const user = await client.isRegisteredUser(phoneNumFormat);
+      
+      if (!user) {
+        return 'No whatsapp tidak terdaftar';
+      }
+      await client.sendMessage(phoneNumFormat, message, { linkPreview: true });
       return 'success';
     } catch (error) {
       console.log(error);
