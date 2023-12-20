@@ -40,6 +40,9 @@ module.exports = (sequelize, DataTypes) => {
     expiredTransaction: {
       type: DataTypes.DATE
     },
+    timeTransaction: {
+      type: DataTypes.DATE
+    },
   }, {
     sequelize,
     modelName: 'Invoice',

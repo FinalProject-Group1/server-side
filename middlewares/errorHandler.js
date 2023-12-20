@@ -36,6 +36,14 @@ function errorHandler(error, req, res, next) {
             statCode = 400;
             message = ["Pesanan belum diantar"];
             break;
+        case "Unpaid":
+            statCode = 400;
+            message = ["Pesanan belum dibayar"];
+            break;
+        case "Refund":
+            statCode = 400;
+            message = ["Transaksi sudah selesai dengan pengembalian dana ke pelanggan"];
+            break;
         case "OnDone":
             statCode = 400;
             message = ["Transaksi telah selesai mohon segera periksa"];

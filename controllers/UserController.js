@@ -121,6 +121,7 @@ class UserController {
 			const user = await User.findByPk(id, {
 				include: {
 					association: 'seller',
+					attributes: ['shopName'],
 					include: [
 						{
 							model: OrderItem,

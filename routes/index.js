@@ -18,14 +18,19 @@ route.post('/login', UserController.login);
 route.post('/payment-success', PaymentGate.success);
 route.get('/products', ProductController.getProducts);
 route.get('/seller-products', SellerProductController.getAllSeller);
-route.get('/products/:id', ProductController.getProductById);
 route.get('/user/:id', UserController.getUserId);
+route.get('/products/:id', ProductController.getProductById);
 route.use(authentication);
 route.get('/user/seller-products', UserController.mySellerProducts);
 route.get('/invoice/:id', InvoiceController.getInvoice);
 route.get('/invoices-seller', UserController.sellerInvoice);
 route.get('/invoices-buyer', UserController.buyerInvoice);
 route.get('/profile', UserController.profile);
+route.post(
+	'/seller-products',
+	authorizationAdd,
+	SellerProductController.sellerAdd
+);
 route.post(
 	'/seller-products',
 	authorizationAdd,
@@ -40,6 +45,7 @@ route.put(
 	SellerProductController.sellerEdit
 );
 route.put('/seller-order', InvoiceController.editInvoiceSeller);
+route.put('/seller-order-cancel', InvoiceController.editInvoiceCancelSeller);
 route.put('/buyer-order', InvoiceController.editInvoiceBuyer);
 
 route.use(error);

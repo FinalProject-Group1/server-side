@@ -1,5 +1,5 @@
 const midtransClient = require('midtrans-client');
-const { Invoice, OrderItem, User } = require('../models');
+const { Invoice, OrderItem, sequelize } = require('../models');
 const { nanoid } = require('nanoid');
 const { Whatsapp } = require('./whatsapp');
 class PaymentGate {
@@ -68,7 +68,7 @@ class PaymentGate {
           {
             "price": ongkir,
             "quantity": 1,
-            "name": "ongkir",
+            "name": "Ongkos Kirim",
           }
         ]
 
@@ -83,8 +83,11 @@ class PaymentGate {
         await invoice.update({ orderStatus: "cancel" });
       }
 
-      if (invoice.orderStatus === 'cancel') throw ({ name: 'Expired' });
-      if (invoice.orderStatus === 'done') throw ({ name: 'OnDone' });
+      if(invoice.orderStatus === 'cancel') throw ({ name: 'Expired' });
+      if(invoice.orderStatus === 'shipment') throw ({ name: "OnShipment" });
+      if(invoice.orderStatus === 'done') throw({name: 'OnDone'})
+      if(invoice.paymentStatus === 'unpaid') throw({name: "Unpaid"});
+      if(invoice.paymentStatus === 'refund') throw({name: "Refund"});
 
       if (!invoice.transactionToken) {
         const transaction = await snap.createTransaction(parameter);
@@ -118,8 +121,9 @@ class PaymentGate {
 
       return format
     }
+    const t = await sequelize.transaction();
     try {
-      console.log(req.body, "<< isi bodynya")
+      // console.log(req.body, "<< isi bodynya")
       const { transaction_status, gross_amount, status_code, order_id, expiry_time, transaction_time } = req.body
       const stat = order_id.split('-')[1]
       // console.log(pk)
@@ -158,8 +162,8 @@ class PaymentGate {
       
       const listProduk = daftarBelanja.join('\r\n');
       if (transaction_status === 'capture') {
-        await invoice.update({ paymentStatus: 'paid', pendingAmount: +gross_amount })
-        const message = `Notifikasi Order Baru
+        await invoice.update({ paymentStatus: 'paid', pendingAmount: +gross_amount, timeTransaction: transaction_time }, {transaction: t})
+        const message = `*Notifikasi Order Baru*
 
 Order ID: ${order_id}
 Tanggal Order: ${changeDate(transaction_time)}
@@ -173,7 +177,7 @@ Telepon: ${invoice.buyer.phoneNumber}
 📦 Daftar Barang:
          
 ${listProduk}
-Ongkos kirim: ${rupiah(9000)}
+Ongkos Kirim: ${rupiah(9000)}
       
 💲 Total Harga: ${rupiah(+gross_amount)}
       
@@ -193,12 +197,14 @@ ${process.env.BASE_URL_CLIENT}/transaction/${invoice.id}?token=${invoice.seller.
 
         res.status(+status_code).json('Payment Succesfull')
       } else if (transaction_status === 'pending') {
-        await invoice.update({ expiredTransaction: expiry_time })
+        await invoice.update({ expiredTransaction: expiry_time }, {transaction: t})
 
         res.status(+status_code).json('Payment Pending')
       }
+      await t.commit();
     } catch (error) {
       // console.log(error, "<< ini errornya")
+      await t.rollback();
       next(error)
     }
 
