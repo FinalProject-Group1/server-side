@@ -5,7 +5,11 @@ const ProductController = require('../controllers/ProductController');
 const SellerProductController = require('../controllers/SellerProductController');
 const UserController = require('../controllers/UserController');
 const authentication = require('../middlewares/authentication');
-const { authorizationAdd, authorizationEdit, authorizationBuyer } = require('../middlewares/authorization');
+const {
+	authorizationAdd,
+	authorizationEdit,
+	authorizationBuyer,
+} = require('../middlewares/authorization');
 
 const error = require('../middlewares/errorHandler');
 
@@ -22,11 +26,24 @@ route.get('/invoice/:id', InvoiceController.getInvoice);
 route.get('/invoices-seller', UserController.sellerInvoice);
 route.get('/invoices-buyer', UserController.buyerInvoice);
 route.get('/profile', UserController.profile);
-route.post('/seller-products', authorizationAdd, SellerProductController.sellerAdd);
+route.post(
+	'/seller-products',
+	authorizationAdd,
+	SellerProductController.sellerAdd
+);
+route.post(
+	'/seller-products',
+	authorizationAdd,
+	SellerProductController.sellerAdd
+);
 route.get('/seller-products/:id', SellerProductController.sellerFindById);
 route.post('/payment', authorizationBuyer, PaymentGate.getMidtransToken);
 route.post('/order', authorizationBuyer, InvoiceController.createInvoice);
-route.put('/seller-products/:id', authorizationEdit, SellerProductController.sellerEdit);
+route.put(
+	'/seller-products/:id',
+	authorizationEdit,
+	SellerProductController.sellerEdit
+);
 route.put('/seller-order', InvoiceController.editInvoiceSeller);
 route.put('/seller-order-cancel', InvoiceController.editInvoiceCancelSeller);
 route.put('/buyer-order', InvoiceController.editInvoiceBuyer);
