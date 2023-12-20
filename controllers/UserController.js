@@ -2,18 +2,16 @@ const { comparePassword } = require('../helpers/bcrypt');
 const { signToken, verifyToken } = require('../helpers/jwt');
 const { User, OrderItem } = require('../models');
 class UserController {
-
-  static async registerBuyer(req, res, next){
+  static async registerBuyer(req, res, next) {
     try {
       const { fullname, phoneNumber, address, password } = req.body;
-      if(!fullname || !phoneNumber || !address || !password) throw ({name: 'FieldMissing'})
+      if (!fullname || !phoneNumber || !address || !password) throw { name: 'FieldMissing' };
 
-      const buyer = await User.create({ fullname, phoneNumber, address, password, role: 'buyer'})  
+      const buyer = await User.create({ fullname, phoneNumber, address, password, role: 'buyer' });
 
-      res.status(201).json(buyer)
-
+      res.status(201).json(buyer);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
@@ -50,7 +48,6 @@ class UserController {
 
       res.status(200).json({ access_token: token });
     } catch (error) {
-      
       next(error);
     }
   }
@@ -76,26 +73,23 @@ class UserController {
 
       res.status(200).json(user);
     } catch (error) {
-      
       next(error);
     }
   }
   static async profile(req, res, next) {
     try {
-      const phoneNumber = req.user.phoneNumber
-      const user = await User.findOne({attributes: ['id','fullname','phoneNumber', 'address'] ,where: {phoneNumber}});
-
+      const phoneNumber = req.user.phoneNumber;
+      const user = await User.findOne({ attributes: ['id', 'fullname', 'phoneNumber', 'address'], where: { phoneNumber } });
 
       res.status(200).json(user);
     } catch (error) {
-
       next(error);
     }
   }
 
   static async sellerInvoice(req, res, next) {
     try {
-      const id = req.user.id
+      const id = req.user.id;
       const user = await User.findByPk(id, {
         include: {
           association: 'seller',
@@ -104,24 +98,22 @@ class UserController {
             include: {
               association: 'sellerproduct',
               include: {
-                association: 'product'
-              }
-            }
-          }
-        }
+                association: 'product',
+              },
+            },
+          },
+        },
       });
-
 
       res.status(200).json(user);
     } catch (error) {
-
       next(error);
     }
   }
 
   static async buyerInvoice(req, res, next) {
     try {
-      const id = req.user.id
+      const id = req.user.id;
       const user = await User.findByPk(id, {
         include: {
           association: 'buyer',
@@ -130,23 +122,37 @@ class UserController {
             include: {
               association: 'sellerproduct',
               include: {
-                association: 'product'
-              }
-            }
-          }
-        }
+                association: 'product',
+              },
+            },
+          },
+        },
       });
-
 
       res.status(200).json(user);
     } catch (error) {
-
       next(error);
     }
   }
 
-  
+  static async mySellerProducts(req, res, next) {
+    try {
+      const id = req.user.id;
 
+      const user = await User.findByPk(id, {
+        include: {
+          association: 'products',
+          include: {
+            association: 'product',
+          },
+        },
+      });
+
+      res.status(200).json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = UserController;

@@ -147,7 +147,7 @@ password: petanisejahtera`
         msg.reply(
           `*Klik link dibawah ini untuk menambahkan produk*
 
-${url}/shop/${user.id}/add-products?token=${token}`,
+${url}/seller/add-product?token=${token}`,
           null,
           { linkPreview: true }
         );
@@ -178,7 +178,7 @@ ${url}/shop/${user.id}/add-products?token=${token}`,
         msg.reply(
           `*Klik di bawah ini untuk menampilkan katalog produk yang tersedia*
 
-${url}/shop/${user.id}/seller-products?token=${token}`,
+${url}/seller/products?token=${token}`,
           null,
           { linkPreview: true }
         );
@@ -206,13 +206,17 @@ ${url}/shop/${user.id}/seller-products?token=${token}`,
           await user.update({ token });
         }
 
-        const userWithProducts = await User.findByPk(user.id, {
+        const userWithProducts = await User.findOne({
+          where: {
+            id: user.id,
+          },
           include: {
             association: 'products',
             include: {
               association: 'product',
             },
           },
+          order: [['products', 'id', 'ASC']],
         });
 
         const messageList = userWithProducts.products.map((el, index) => {
@@ -258,7 +262,7 @@ contoh: edit 1`);
         msg.reply(
           `*Klik link dibawah ini untuk menampilkan list transaksi yang anda punya*
 
-${url}/invoices?token=${token}`,
+${url}/transaction?token=${token}`,
           null,
           { linkPreview: true }
         );
@@ -288,22 +292,25 @@ ${url}/invoices?token=${token}`,
           await user.update({ token });
         }
 
-        const userWithProducts = await User.findByPk(user.id, {
+        const userWithProducts = await User.findOne({
+          where: {
+            id: user.id,
+          },
           include: {
             association: 'products',
             include: {
               association: 'product',
             },
           },
+          order: [['products', 'id', 'ASC']],
         });
 
         const productId = userWithProducts.products[+index - 1].id;
 
-        
         msg.reply(
           `*Klik link di bawah ini untuk melakukan edit pada produk ${userWithProducts.products[+index - 1].product.productName}*
         
-${url}/shop/${user.id}/seller-products/${productId}?token=${token}`,
+${url}/seller/products/${productId}?token=${token}`,
           null,
           { linkPreview: true }
         );
@@ -321,6 +328,11 @@ class Whatsapp {
   static async sendMessage(noHp, message) {
     try {
       const phoneNumFormat = noHp + '@c.us';
+      const user = await client.isRegisteredUser(phoneNumFormat);
+      console.log(user);
+      if (!user) {
+        return 'No whatsapp tidak terdaftar';
+      }
       await client.sendMessage(phoneNumFormat, message);
       return 'success';
     } catch (error) {
