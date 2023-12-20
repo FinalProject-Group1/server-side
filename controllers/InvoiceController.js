@@ -1,5 +1,5 @@
 const { Invoice, OrderItem, sequelize, SellerProduct, User } = require('../models');
-const { Op, where } = require('sequelize');
+const { Op } = require('sequelize');
 const { Whatsapp } = require('./whatsapp');
 class InvoiceController {
   static async getInvoice(req, res, next) {
@@ -117,13 +117,13 @@ class InvoiceController {
 
       await invoice.update({ pendingAmount: 0 }, { transaction: t });
       await t.commit();
-      const message = `Notifikasi Order Selesai
+      const message = `*Notifikasi Order Selesai*
 
 Orderan dengan
 id : ${invoice.OrderId}
-Telah selesai
+telah *_selesai_*
       
-Dana Sebesar ${rupiah(temp)} telah masuk ke dalam rekeningmu`;
+Dana sebesar ${rupiah(temp)} telah masuk ke dalam rekeningmu`;
       Whatsapp.sendMessage(invoice.seller.phoneNumber, message);
 
       res.status(200).json({ message: 'Orderan Diselesaikan' });
@@ -183,7 +183,7 @@ Dana Sebesar ${rupiah(temp)} telah masuk ke dalam rekeningmu`;
 
       await t.commit();
 
-      const message = `Notifikasi Order Selesai
+      const message = `*Notifikasi Order Dalam Perjalanan*
 
 Orderan dengan
 id : ${invoice.OrderId}
@@ -245,13 +245,11 @@ Pastikan apabila telah menerima paket maka untuk cek terlebih dahulu`;
 
       await t.commit();
 
-      const message = `Notifikasi Order Selesai
+      const message = `*Notifikasi Order Cancel*
 
 Orderan dengan
 id : ${invoice.OrderId}
-🚚 Status Pengiriman: Dicancel oleh seller
-      
-Pastikan apabila telah menerima paket maka untuk cek terlebih dahulu`;
+🚚 Status Pengiriman: Dicancel oleh seller`;
       // console.log(invoice);
       // console.log(invoice.buyer);
       await Whatsapp.sendMessage(invoice.buyer.phoneNumber, message);
@@ -311,10 +309,10 @@ Pastikan apabila telah menerima paket maka untuk cek terlebih dahulu`;
         
       })
       )
-      t.commit()
+      await t.commit()
       }
     } catch (error) {
-      t.rollback()
+      await t.rollback()
       console.log(error)
     }
     

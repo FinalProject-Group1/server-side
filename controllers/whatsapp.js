@@ -92,7 +92,7 @@ password: petanisejahtera`
 
         const city = msg.body.replace('kota: ', '');
         if (user.city && user.city !== null) {
-          msg.reply(`*Anda sudah memiliki alamat kota di ${user.address} dan tidak bisa menggantinya lagi*` + messageFormat.listCommand);
+          msg.reply(`*Anda sudah memiliki alamat kota di ${user.city} dan tidak bisa menggantinya lagi*` + messageFormat.listCommand);
           return;
         }
 
