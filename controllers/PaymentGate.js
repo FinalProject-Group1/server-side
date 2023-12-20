@@ -119,7 +119,7 @@ class PaymentGate {
       return format
     }
     try {
-      console.log(req.body, "<< isi bodynya")
+      // console.log(req.body, "<< isi bodynya")
       const { transaction_status, gross_amount, status_code, order_id, expiry_time, transaction_time } = req.body
       const stat = order_id.split('-')[1]
       // console.log(pk)
@@ -158,7 +158,7 @@ class PaymentGate {
       
       const listProduk = daftarBelanja.join('\r\n');
       if (transaction_status === 'capture') {
-        await invoice.update({ paymentStatus: 'paid', pendingAmount: +gross_amount })
+        await invoice.update({ paymentStatus: 'paid', pendingAmount: +gross_amount, timeTransaction: transaction_time })
         const message = `Notifikasi Order Baru
 
 Order ID: ${order_id}

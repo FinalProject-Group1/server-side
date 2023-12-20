@@ -27,6 +27,7 @@ route.post('/payment', authorizationBuyer, PaymentGate.getMidtransToken);
 route.post('/order', authorizationBuyer, InvoiceController.createInvoice);
 route.put('/seller-products/:id', authorizationEdit, SellerProductController.sellerEdit);
 route.put('/seller-order', InvoiceController.editInvoiceSeller);
+route.put('/seller-order-cancel', InvoiceController.editInvoiceCancelSeller);
 route.put('/buyer-order', InvoiceController.editInvoiceBuyer);
 
 route.use(error);

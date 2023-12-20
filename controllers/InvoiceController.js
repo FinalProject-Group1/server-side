@@ -1,5 +1,5 @@
 const { Invoice, OrderItem, sequelize, SellerProduct, User } = require('../models');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 const { Whatsapp } = require('./whatsapp');
 class InvoiceController {
   static async getInvoice(req, res, next) {
@@ -107,11 +107,12 @@ class InvoiceController {
       await invoice.update({ orderStatus: 'done' }, { transaction: t });
       const amount = invoice.pendingAmount;
       const temp = +amount - 9000;
+      const result = (temp - (temp*0.005)) 
 
       if (!invoice.seller.saldo) {
-        await invoice.seller.update({ saldo: temp }, { transaction: t });
+        await invoice.seller.update({ saldo: result }, { transaction: t });
       } else {
-        await invoice.seller.update({ saldo: invoice.seller.saldo + temp }, { transaction: t });
+        await invoice.seller.update({ saldo: invoice.seller.saldo + result }, { transaction: t });
       }
 
       await invoice.update({ pendingAmount: 0 }, { transaction: t });
@@ -162,7 +163,10 @@ Dana Sebesar ${rupiah(temp)} telah masuk ke dalam rekeningmu`;
 
       if (!invoice) throw { name: 'NotFound' };
       // console.log(invoice.OrderItems, "<< ini order items")
-      if (invoice.orderStatus === 'shipment') throw { name: 'OnShipment' };
+      if (invoice.orderStatus === 'shipment') throw ({ name: "OnShipment" });
+      if(invoice.paymentStatus === 'unpaid') throw({name: "Unpaid"});
+      if(invoice.orderStatus === 'done') throw({name: 'OnDone'})
+
       const updatingStock = await Promise.all(
         invoice.OrderItems.map(async (el) => {
           if (el.SellerProductId === el.sellerproduct.id) {
@@ -186,17 +190,137 @@ id : ${invoice.OrderId}
 🚚 Status Pengiriman: Dalam Perjalanan
       
 Pastikan apabila telah menerima paket maka untuk cek terlebih dahulu`;
-      console.log(invoice);
-      console.log(invoice.buyer);
+      // console.log(invoice);
+      // console.log(invoice.buyer);
       await Whatsapp.sendMessage(invoice.buyer.phoneNumber, message);
 
       res.status(200).json({ message: 'Orderan dalam pengiriman' });
     } catch (error) {
-      console.log(error, '<< ini error');
+      
       await t.rollback();
       next(error);
     }
   }
+
+  static async editInvoiceCancelSeller(req, res, next) {
+    const t = await sequelize.transaction();
+    try {
+      const { BuyerId, InvoiceId } = req.body;
+      const SellerId = req.user.id;
+      const invoice = await Invoice.findOne({
+        include: [
+          {
+            association: 'seller',
+          },
+          {
+            association: 'buyer',
+          },
+          {
+            model: OrderItem,
+            include: {
+              association: 'sellerproduct',
+              include: {
+                association: 'product',
+              },
+            },
+          },
+        ],
+        where: {
+          [Op.and]: [{ SellerId }, { BuyerId: +BuyerId }, { id: +InvoiceId }],
+        },
+      });
+
+      if (!invoice) throw ({ name: 'NotFound' });
+      // console.log(invoice.OrderItems, "<< ini order items")
+      if (invoice.orderStatus === 'shipment') throw { name: 'OnShipment' };
+      
+
+      await invoice.update({ orderStatus: 'cancel' }, { transaction: t });
+      
+      if(!invoice.buyer.saldo){
+        await invoice.buyer.update({saldo: +invoice.pendingAmount}, { transaction: t })
+      }else{
+        await invoice.buyer.update({saldo: (Number(invoice.pendingAmount) +  invoice.buyer.saldo)}, { transaction: t })
+      }
+
+      await t.commit();
+
+      const message = `Notifikasi Order Selesai
+
+Orderan dengan
+id : ${invoice.OrderId}
+🚚 Status Pengiriman: Dicancel oleh seller
+      
+Pastikan apabila telah menerima paket maka untuk cek terlebih dahulu`;
+      // console.log(invoice);
+      // console.log(invoice.buyer);
+      await Whatsapp.sendMessage(invoice.buyer.phoneNumber, message);
+
+      res.status(200).json({ message: 'Orderan dicancel' });
+    } catch (error) {
+      
+      await t.rollback();
+      next(error);
+    }
+  }
+
+  static async checkInvoice (){
+    // console.log("masuk isni")
+    const t = await sequelize.transaction();
+    /**
+     * 1. nge query database yang status progress dan timeTransaction + 1x24 jam
+     * 2. ada status progress belum di update by hit endpoint 
+     * 3. ubah data progress jadi cancel (background Job cron job + enpoint ini)
+     */
+    try {
+      let currentTime = new Date()
+      const invoices = await Invoice.findAll({
+        where: {
+        [Op.and]: [{ orderStatus: 'progress' }, { paymentStatus: 'paid' }],
+      },
+      include: {
+        association: 'buyer'
+      }
+    })
+
+      if(invoices.length !== 0){
+        await Promise.all(
+          invoices.map(async (el) => {
+            let expiredLink = el.timeTransaction.setDate(el.timeTransaction.getDate() + 1);
+            let shipDeadline = new Date(expiredLink) 
+              if(shipDeadline < currentTime){
+            await Invoice.update(
+              { orderStatus: 'cancel' },
+              { where: { id: el.id }, transaction: t }
+          );
+
+          const user = await User.findByPk(el.buyer.id)
+          if(!user.saldo){
+            await user.update({saldo: el.pendingAmount}, {transaction: t})
+          }else{
+            await user.update({saldo: (el.pendingAmount + user.saldo)}, {transaction: t})
+          }
+
+          await Invoice.update(
+            { paymentStatus: 'refund', pendingAmount: 0 },
+            { where: { id: el.id }, transaction: t}
+          );
+          return ;
+        };
+        
+        
+      })
+      )
+      t.commit()
+      }
+    } catch (error) {
+      t.rollback()
+      console.log(error)
+    }
+    
+
+  }
+
 }
 
 module.exports = InvoiceController;
