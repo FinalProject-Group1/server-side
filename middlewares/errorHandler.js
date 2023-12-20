@@ -32,10 +32,6 @@ function errorHandler(error, req, res, next) {
             statCode = 400;
             message = ["Pesanan sudah dalam perjalanan"];
             break;
-        case "OnDelivery":
-            statCode = 400;
-            message = ["Pesanan sudah dalam perjalanan"];
-            break;
         case "OnShipping":
             statCode = 400;
             message = ["Pesanan belum diantar"];
@@ -43,6 +39,10 @@ function errorHandler(error, req, res, next) {
         case "Unpaid":
             statCode = 400;
             message = ["Pesanan belum dibayar"];
+            break;
+        case "Refund":
+            statCode = 400;
+            message = ["Transaksi sudah selesai dengan pengembalian dana ke pelanggan"];
             break;
         case "OnDone":
             statCode = 400;
