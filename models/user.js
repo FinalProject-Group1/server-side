@@ -26,7 +26,10 @@ module.exports = (sequelize, DataTypes) => {
     token: DataTypes.STRING,
     role: DataTypes.STRING,
     password: DataTypes.STRING,
-    saldo: DataTypes.INTEGER,
+    saldo: {
+     type : DataTypes.INTEGER,
+     defaultValue: 0
+    },
     shopName: DataTypes.STRING
   }, {
     sequelize,
