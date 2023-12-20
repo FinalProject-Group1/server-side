@@ -78,14 +78,27 @@ class UserController {
   }
   static async profile(req, res, next) {
     try {
-      const phoneNumber = req.user.phoneNumber;
-      const user = await User.findOne({ attributes: ['id', 'fullname', 'phoneNumber', 'address'], where: { phoneNumber } });
+        const phoneNumber = req.user.phoneNumber;
+        const user = await User.findOne({
+            attributes: [
+                'id',
+                'fullname',
+                'phoneNumber',
+                'address',
+                'city',
+                'role',
+                'token',
+                'shopName',
+                'saldo',
+            ],
+            where: { phoneNumber },
+        });
 
-      res.status(200).json(user);
+        res.status(200).json(user);
     } catch (error) {
-      next(error);
+        next(error);
     }
-  }
+}
 
   static async sellerInvoice(req, res, next) {
     try {
