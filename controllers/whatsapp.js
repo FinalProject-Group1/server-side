@@ -328,7 +328,7 @@ class Whatsapp {
   static async sendMessage(noHp, message) {
     try {
       const phoneNumFormat = noHp + '@c.us';
-      await client.sendMessage(phoneNumFormat, message);
+      await client.sendMessage(phoneNumFormat, message, {linkPreview: true});
       return 'success';
     } catch (error) {
       console.log(error);
