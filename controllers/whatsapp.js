@@ -1,4 +1,4 @@
-const { Client, LocalAuth, Buttons } = require('whatsapp-web.js');
+const { Client, LocalAuth } = require('whatsapp-web.js');
 const { User } = require('../models');
 
 const client = new Client({
@@ -18,6 +18,7 @@ client.on('ready', () => {
 });
 
 function message() {
+  const url = process.env.BASE_URL_CLIENT;
   client.on('message', async (msg) => {
     try {
       const phoneNum = msg.id.remote;
@@ -25,7 +26,6 @@ function message() {
 
       //Daftar sebagai seller
       if (msg.body == '1') {
-        console.log(phoneNumberFormat);
         const user = await User.findOne({ where: { phoneNumber: phoneNumberFormat } });
         if (user) {
           client.sendMessage(msg.id.remote, `*Akun kamu telah terdaftar tidak bisa daftar dengan nomor whatsapp yang sama*` + messageFormat.listCommand);
@@ -41,13 +41,6 @@ password: petanisejahtera`
         );
         return;
       } else if (msg.body.startsWith('password:')) {
-        // Masukkan password dan masukkan data user ke database
-        // const info = await msg.getInfo();s
-        const contact = await msg.getContact();
-        const profilePic = await client.getProfilePicUrl(contact.id);
-
-        console.log(contact, '<<< ini concsole', profilePic, '<<< ini profilePic');
-
         const password = msg.body.split(' ')[1];
         // pengecekan accountya udah terdaftar atau belum
         const user = await User.findOne({ where: { phoneNumber: phoneNumberFormat } });
@@ -59,7 +52,7 @@ password: petanisejahtera`
         }
         const hashingPassword = hashPassword(password);
         const newUser = await User.create({ phoneNumber: phoneNumberFormat, password: hashingPassword, role: 'seller' });
-        msg.reply(messageFormat.register + 'Selanjutnya anda harus memasukkan nama toko' + messageFormat.nameShop);
+        msg.reply(messageFormat.register + 'Selanjutnya anda harus memasukkan nama toko dan alamat toko anda' + messageFormat.nameShop);
         return;
       }
 
@@ -84,24 +77,36 @@ password: petanisejahtera`
         //melakukan perubahan nama toko
         user.update({ shopName });
 
-        client.sendMessage(msg.id.remote, `Nama toko ${shopName} telah ditambahkan pada akun anda` + messageFormat.listCommand);
+        client.sendMessage(
+          msg.id.remote,
+          `Nama toko ${shopName} telah ditambahkan pada akun anda.
+
+ ${messageFormat.address}       `
+        );
         return;
       }
 
-      if (msg.body.startsWith('alamat:')) {
+      if (msg.body.startsWith('kota:')) {
         //Pembuatan Alamat ketika si seller belum menambahkan Alamat
         //NOTE: Toko hanya bisa dibuat ketika seller register dan tidak bisa diubah kembali ketika si seller memasukkan command yang sama
 
-        const address = msg.body.replace('alamat: ', '');
-        if (user.address && user.address !== null) {
-          msg.reply(`*Anda sudah memiliki alamat yang bernama ${user.address} dan tidak bisa menggantinya lagi*` + messageFormat.listCommand);
+        const city = msg.body.replace('kota: ', '');
+        if (user.city && user.city !== null) {
+          msg.reply(`*Anda sudah memiliki alamat kota di ${user.address} dan tidak bisa menggantinya lagi*` + messageFormat.listCommand);
+          return;
+        }
+
+        const cityAvailable = 'Jakarta';
+
+        if (city.toLowerCase() !== cityAvailable.toLowerCase()) {
+          msg.reply(`Mohon maaf untuk sekarang aplikasi kami baru tersedia untuk daerah Provinsi Jakarta`);
           return;
         }
 
         //melakukan perubahan Alamat
-        user.update({ address });
+        user.update({ city });
 
-        client.sendMessage(msg.id.remote, `Alamat ${address} telah ditambahkan pada akun anda` + messageFormat.listCommand);
+        client.sendMessage(msg.id.remote, `Alamat ${city} telah ditambahkan pada akun anda` + messageFormat.listCommand);
         return;
       }
 
@@ -112,7 +117,7 @@ password: petanisejahtera`
         return;
       }
 
-      if (user.address === null) {
+      if (user.city === null) {
         client.sendMessage(msg.id.remote, messageFormat.address);
         return;
       }
@@ -139,7 +144,13 @@ password: petanisejahtera`
           await user.update({ token });
           //update token di database
         }
-        msg.reply(`http://localhost:3000/shop/${user.id}/add-products?token=${token}`, null, { linkPreview: true });
+        msg.reply(
+          `*Klik link dibawah ini untuk menambahkan produk*
+
+${url}/seller/add-product?token=${token}`,
+          null,
+          { linkPreview: true }
+        );
         //mengirim link yang menuju ke tambah produk si seller
         return;
       } else if (msg.body == '3') {
@@ -164,7 +175,13 @@ password: petanisejahtera`
           await user.update({ token });
         }
 
-        msg.reply(`http://localhost:3000/shop/${user.id}/seller-products?token=${token}`, null, { linkPreview: true });
+        msg.reply(
+          `*Klik di bawah ini untuk menampilkan katalog produk yang tersedia*
+
+${url}/seller/products?token=${token}`,
+          null,
+          { linkPreview: true }
+        );
         //mengirim link yang menuju ke Katalog seller
         return;
       } else if (msg.body == '4') {
@@ -189,13 +206,17 @@ password: petanisejahtera`
           await user.update({ token });
         }
 
-        const userWithProducts = await User.findByPk(user.id, {
+        const userWithProducts = await User.findOne({
+          where: {
+            id: user.id,
+          },
           include: {
             association: 'products',
             include: {
               association: 'product',
             },
           },
+          order: [['products', 'id', 'ASC']],
         });
 
         const messageList = userWithProducts.products.map((el, index) => {
@@ -238,7 +259,13 @@ contoh: edit 1`);
           //update token di database
           await user.update({ token });
         }
-        msg.reply(`http://localhost:3000/invoices?token=${token}`, null, { linkPreview: true });
+        msg.reply(
+          `*Klik link dibawah ini untuk menampilkan list transaksi yang anda punya*
+
+${url}/transaction?token=${token}`,
+          null,
+          { linkPreview: true }
+        );
         //mengirim link yang menuju ke Daftar transaksi seller
         return;
       }
@@ -265,18 +292,28 @@ contoh: edit 1`);
           await user.update({ token });
         }
 
-        const userWithProducts = await User.findByPk(user.id, {
+        const userWithProducts = await User.findOne({
+          where: {
+            id: user.id,
+          },
           include: {
             association: 'products',
             include: {
               association: 'product',
             },
           },
+          order: [['products', 'id', 'ASC']],
         });
 
         const productId = userWithProducts.products[+index - 1].id;
 
-        msg.reply(`http://localhost:3000/shop/${user.id}/seller-products/${productId}?token=${token}`, null, { linkPreview: true });
+        msg.reply(
+          `*Klik link di bawah ini untuk melakukan edit pada produk ${userWithProducts.products[+index - 1].product.productName}*
+        
+${url}/seller/products/${productId}?token=${token}`,
+          null,
+          { linkPreview: true }
+        );
         return;
       }
 
@@ -291,7 +328,12 @@ class Whatsapp {
   static async sendMessage(noHp, message) {
     try {
       const phoneNumFormat = noHp + '@c.us';
-      await client.sendMessage(noHp, message);
+      const user = await client.isRegisteredUser(phoneNumFormat);
+      console.log(user);
+      if (!user) {
+        return 'No whatsapp tidak terdaftar';
+      }
+      await client.sendMessage(phoneNumFormat, message);
       return 'success';
     } catch (error) {
       console.log(error);

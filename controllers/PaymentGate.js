@@ -73,20 +73,27 @@ class PaymentGate {
         ]
 
       };
-      if (invoice.transactionToken > (new Date())) {
-        await invoice.update({ orderStatus: "cancel" })
+      let currentTime = new Date();
+      let expiredLink = currentTime.setDate(currentTime.getDate() + 1);
+      let tomorrow = new Date(expiredLink) 
+
+      await invoice.update({expiredTransaction: tomorrow});
+
+      if (invoice.expiredTransaction < currentTime && invoice.orderStatus === 'progress') {
+        await invoice.update({ orderStatus: "cancel" });
       }
 
-      if (invoice.orderStatus === 'cancel') throw ({ name: 'Expired' })
+      if (invoice.orderStatus === 'cancel') throw ({ name: 'Expired' });
+      if (invoice.orderStatus === 'done') throw ({ name: 'OnDone' });
 
       if (!invoice.transactionToken) {
-        const transaction = await snap.createTransaction(parameter)
-        await invoice.update({ transactionToken: transaction.token, OrderId: orderId })
+        const transaction = await snap.createTransaction(parameter);
+        await invoice.update({ transactionToken: transaction.token, OrderId: orderId });
 
-        res.json({ transaction_token: transaction.token, orderId })
+        res.json({ transaction_token: transaction.token, orderId });
         console.log(transaction)
       } else {
-        res.json({ transaction_token: invoice.transactionToken, orderId: invoice.OrderId })
+        res.json({ transaction_token: invoice.transactionToken, orderId: invoice.OrderId });
       }
 
     } catch (error) {
@@ -95,6 +102,22 @@ class PaymentGate {
     }
   }
   static async success(req, res, next) {
+    const rupiah = (number) => {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR"
+      }).format(number);
+    }
+    const changeDate = (date) => {
+      const data = new Date(date)
+      const day = data.toLocaleString("ID", { day: '2-digit' })
+      const month = data.toLocaleString("ID", { month: 'long' })
+      const year = data.toLocaleString("ID", { year: 'numeric' })
+
+      const format = `${day} ${month} ${year}`
+
+      return format
+    }
     try {
       console.log(req.body, "<< isi bodynya")
       const { transaction_status, gross_amount, status_code, order_id, expiry_time, transaction_time } = req.body
@@ -126,26 +149,13 @@ class PaymentGate {
 
       const daftarBelanja = invoice.OrderItems.map((el, index) => {
         return `${index + 1}. ${el.sellerproduct.product.productName}
-        - Jumlah: ${el.quantity}
-        - Harga Satuan: ${el.sellerproduct.price}
+        - Jumlah: ${el.quantity} ${el.sellerproduct.product.unit}
+        - Harga Satuan: ${rupiah(el.sellerproduct.price)}
+        - Subtotal:  ${rupiah(el.quantity*el.sellerproduct.price)}
           `;
       });
-      const changeDate = (date) => {
-        const data = new Date(date)
-        const day = data.toLocaleString("ID", { day: '2-digit' })
-        const month = data.toLocaleString("ID", { month: 'long' })
-        const year = data.toLocaleString("ID", { year: 'numeric' })
-
-        const format = `${day} ${month} ${year}`
-
-        return format
-      }
-      const rupiah = (number) => {
-        return new Intl.NumberFormat("id-ID", {
-          style: "currency",
-          currency: "IDR"
-        }).format(number);
-      }
+      
+      
       const listProduk = daftarBelanja.join('\r\n');
       if (transaction_status === 'capture') {
         await invoice.update({ paymentStatus: 'paid', pendingAmount: +gross_amount })
@@ -163,7 +173,7 @@ Telepon: ${invoice.buyer.phoneNumber}
 📦 Daftar Barang:
          
 ${listProduk}
-ongkir = 9000
+Ongkos kirim: ${rupiah(9000)}
       
 💲 Total Harga: ${rupiah(+gross_amount)}
       
@@ -171,13 +181,19 @@ ongkir = 9000
       
 💰 Status Pembayaran: Sudah Dibayar
       
-🚚 Status Pengiriman: Belum Dikirim`
+🚚 Status Pengiriman: Belum Dikirim
+
+klik link di bawah ini untuk mengubah status orderanmu
+         |  |  |
+        V V V
+
+${process.env.BASE_URL_CLIENT}/transaction/${invoice.id}?token=${invoice.seller.token}`
 
        await Whatsapp.sendMessage(invoice.seller.phoneNumber, message)
 
         res.status(+status_code).json('Payment Succesfull')
       } else if (transaction_status === 'pending') {
-        await invoice.update({ transactionToken: expiry_time })
+        await invoice.update({ expiredTransaction: expiry_time })
 
         res.status(+status_code).json('Payment Pending')
       }
