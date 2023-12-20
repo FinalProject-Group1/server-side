@@ -53,10 +53,9 @@ class SellerProductController {
   static async sellerEdit(req, res, next) {
     try {
       const { id } = req.params;
-      const { ProductId, stock, price } = req.body;
+      const { stock, price } = req.body;
       // console.log(req.user, "<<<")
       const SellerId = req.user.id;
-      console.log({ ProductId, stock, price, SellerId });
       //   {ProductId: +ProductId, stock: +stock, price: +price, SellerId}
       let status;
       if (+stock === 0) {
