@@ -70,10 +70,11 @@ class InvoiceController {
         return obj;
       });
       // console.log(newProducts)
-      const createOrder = await OrderItem.bulkCreate(newProducts, { transaction: t });
+      await OrderItem.bulkCreate(newProducts, { transaction: t });
+
       await t.commit();
 
-      res.status(201).json(createOrder);
+      res.status(201).json({invoiceId: createINV.id});
     } catch (error) {
       await t.rollback();
       // console.log(error)
