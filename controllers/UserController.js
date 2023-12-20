@@ -93,7 +93,7 @@ class UserController {
       const user = await User.findByPk(id, {
         include: {
           association: 'seller',
-          include: {
+          include: [{
             model: OrderItem,
             include: {
               association: 'sellerproduct',
@@ -102,6 +102,9 @@ class UserController {
               },
             },
           },
+          {
+            association: 'buyer'
+          },],
         },
       });
 
