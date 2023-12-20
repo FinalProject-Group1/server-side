@@ -92,7 +92,7 @@ password: petanisejahtera`
 
         const city = msg.body.replace('kota: ', '');
         if (user.city && user.city !== null) {
-          msg.reply(`*Anda sudah memiliki alamat kota di ${user.address} dan tidak bisa menggantinya lagi*` + messageFormat.listCommand);
+          msg.reply(`*Anda sudah memiliki alamat kota di ${user.city} dan tidak bisa menggantinya lagi*` + messageFormat.listCommand);
           return;
         }
 
@@ -328,12 +328,7 @@ class Whatsapp {
   static async sendMessage(noHp, message) {
     try {
       const phoneNumFormat = noHp + '@c.us';
-      const user = await client.isRegisteredUser(phoneNumFormat);
-      console.log(user);
-      if (!user) {
-        return 'No whatsapp tidak terdaftar';
-      }
-      await client.sendMessage(phoneNumFormat, message);
+      await client.sendMessage(phoneNumFormat, message, {linkPreview: true});
       return 'success';
     } catch (error) {
       console.log(error);

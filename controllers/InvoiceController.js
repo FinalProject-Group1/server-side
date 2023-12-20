@@ -2,6 +2,7 @@ const { Invoice, OrderItem, sequelize, SellerProduct, User } = require('../model
 const { Op } = require('sequelize');
 const { Whatsapp } = require('./whatsapp');
 class InvoiceController {
+
   static async getInvoice(req, res, next) {
     try {
       const { id } = req.params;
@@ -80,49 +81,54 @@ class InvoiceController {
     }
   }
 
-  static async editInvoiceBuyer(req, res, next) {
-    const rupiah = (number) => {
-      return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-      }).format(number);
-    };
-    const t = await sequelize.transaction();
-    try {
-      const { SellerId, InvoiceId } = req.body;
-      const BuyerId = req.user.id;
-      const invoice = await Invoice.findOne({
-        include: {
-          association: 'seller',
-        },
-        where: {
-          [Op.and]: [{ SellerId: +SellerId }, { BuyerId }, { id: +InvoiceId }],
-        },
-      });
+	static async editInvoiceBuyer(req, res, next) {
+		const rupiah = (number) => {
+			return new Intl.NumberFormat('id-ID', {
+				style: 'currency',
+				currency: 'IDR',
+			}).format(number);
+		};
+		const t = await sequelize.transaction();
+		try {
+			const { SellerId, InvoiceId } = req.body;
+			const BuyerId = req.user.id;
+			const invoice = await Invoice.findOne({
+				include: {
+					association: 'seller',
+				},
+				where: {
+					[Op.and]: [{ SellerId: +SellerId }, { BuyerId }, { id: +InvoiceId }],
+				},
+			});
 
-      if (!invoice) throw { name: 'NotFound' };
-      if (invoice.orderStatus === 'done') throw { name: 'OnDone' };
-      if (invoice.orderStatus !== 'shipment') throw { name: 'OnShipping' };
+			if (!invoice) throw { name: 'NotFound' };
+			if (invoice.orderStatus === 'done') throw { name: 'OnDone' };
+			if (invoice.orderStatus !== 'shipment') throw { name: 'OnShipping' };
 
-      await invoice.update({ orderStatus: 'done' }, { transaction: t });
-      const amount = invoice.pendingAmount;
-      const temp = +amount - 9000;
+			await invoice.update({ orderStatus: 'done' }, { transaction: t });
+			const amount = invoice.pendingAmount;
+			const temp = +amount - 9000;
 
-      if (!invoice.seller.saldo) {
-        await invoice.seller.update({ saldo: temp }, { transaction: t });
-      } else {
-        await invoice.seller.update({ saldo: invoice.seller.saldo + temp }, { transaction: t });
-      }
+			if (!invoice.seller.saldo) {
+				await invoice.seller.update({ saldo: temp }, { transaction: t });
+			} else {
+				await invoice.seller.update(
+					{ saldo: invoice.seller.saldo + temp },
+					{ transaction: t }
+				);
+			}
 
-      await invoice.update({ pendingAmount: 0 }, { transaction: t });
-      await t.commit();
-      const message = `Notifikasi Order Selesai
+			await invoice.update({ pendingAmount: 0 }, { transaction: t });
+			await t.commit();
+			const message = `Notifikasi Order Selesai
+
 
 Orderan dengan
 id : ${invoice.OrderId}
-Telah selesai
+telah *_selesai_*
       
-Dana Sebesar ${rupiah(temp)} telah masuk ke dalam rekeningmu`;
+
+Dana sebesar ${rupiah(temp)} telah masuk ke dalam rekeningmu`;
       Whatsapp.sendMessage(invoice.seller.phoneNumber, message);
 
       res.status(200).json({ message: 'Orderan Diselesaikan' });
@@ -162,7 +168,11 @@ Dana Sebesar ${rupiah(temp)} telah masuk ke dalam rekeningmu`;
 
       if (!invoice) throw { name: 'NotFound' };
       // console.log(invoice.OrderItems, "<< ini order items")
-      if (invoice.orderStatus === 'shipment') throw { name: 'OnShipment' };
+      if (invoice.orderStatus === 'shipment') throw ({ name: "OnShipment" });
+      if(invoice.orderStatus === 'done') throw({name: 'OnDone'})
+      if(invoice.paymentStatus === 'unpaid') throw({name: "Unpaid"});
+      if(invoice.paymentStatus === 'refund') throw({name: "Refund"});
+
       const updatingStock = await Promise.all(
         invoice.OrderItems.map(async (el) => {
           if (el.SellerProductId === el.sellerproduct.id) {
@@ -179,23 +189,138 @@ Dana Sebesar ${rupiah(temp)} telah masuk ke dalam rekeningmu`;
 
       await t.commit();
 
-      const message = `Notifikasi Order Selesai
+      const message = `*Notifikasi Order Dalam Perjalanan*
+
+Dana Sebesar ${rupiah(temp)} telah masuk ke dalam rekeningmu`;
+			Whatsapp.sendMessage(invoice.seller.phoneNumber, message);
+
+			res.status(200).json({ message: 'Orderan Diselesaikan' });
+		} catch (error) {
+			await t.rollback();
+			next(error);
+		}
+	}
+
+  static async editInvoiceCancelSeller(req, res, next) {
+    const t = await sequelize.transaction();
+    try {
+      const { BuyerId, InvoiceId } = req.body;
+      const SellerId = req.user.id;
+      const invoice = await Invoice.findOne({
+        include: [
+          {
+            association: 'seller',
+          },
+          {
+            association: 'buyer',
+          },
+          {
+            model: OrderItem,
+            include: {
+              association: 'sellerproduct',
+              include: {
+                association: 'product',
+              },
+            },
+          },
+        ],
+        where: {
+          [Op.and]: [{ SellerId }, { BuyerId: +BuyerId }, { id: +InvoiceId }],
+        },
+      });
+
+      if (!invoice) throw ({ name: 'NotFound' });
+      // console.log(invoice.OrderItems, "<< ini order items")
+      if(invoice.orderStatus === 'shipment') throw ({ name: "OnShipment" });
+      if(invoice.orderStatus === 'done') throw({name: 'OnDone'})
+      if(invoice.paymentStatus === 'unpaid') throw({name: "Unpaid"});
+      if(invoice.paymentStatus === 'refund') throw({name: "Refund"});
+      
+
+      await invoice.update({ orderStatus: 'cancel' }, { transaction: t });
+      
+      if(!invoice.buyer.saldo){
+        await invoice.buyer.update({saldo: +invoice.pendingAmount}, { transaction: t })
+      }else{
+        await invoice.buyer.update({saldo: (Number(invoice.pendingAmount) +  invoice.buyer.saldo)}, { transaction: t })
+      }
+      
+      await invoice.update({ paymentStatus: 'refund' }, { transaction: t });
+      
+      await t.commit();
+
+      const message = `*Notifikasi Order Cancel*
 
 Orderan dengan
 id : ${invoice.OrderId}
-🚚 Status Pengiriman: Dalam Perjalanan
-      
-Pastikan apabila telah menerima paket maka untuk cek terlebih dahulu`;
-      console.log(invoice);
-      console.log(invoice.buyer);
+🚚 Status Pengiriman: Dicancel oleh seller`;
+      // console.log(invoice);
+      // console.log(invoice.buyer);
       await Whatsapp.sendMessage(invoice.buyer.phoneNumber, message);
 
-      res.status(200).json({ message: 'Orderan dalam pengiriman' });
+      res.status(200).json({ message: 'Orderan dicancel' });
     } catch (error) {
-      console.log(error, '<< ini error');
+      
       await t.rollback();
       next(error);
     }
+  }
+
+  static async checkInvoice (){
+    // console.log("masuk isni")
+    const t = await sequelize.transaction();
+    /**
+     * 1. nge query database yang status progress dan timeTransaction + 1x24 jam
+     * 2. ada status progress belum di update by hit endpoint 
+     * 3. ubah data progress jadi cancel (background Job cron job + enpoint ini)
+     */
+    try {
+      let currentTime = new Date()
+      const invoices = await Invoice.findAll({
+        where: {
+        [Op.and]: [{ orderStatus: 'progress' }, { paymentStatus: 'paid' }],
+      },
+      include: {
+        association: 'buyer'
+      }
+    })
+
+      if(invoices.length !== 0){
+        await Promise.all(
+          invoices.map(async (el) => {
+            let expiredLink = el.timeTransaction.setDate(el.timeTransaction.getDate() + 1);
+            let shipDeadline = new Date(expiredLink) 
+              if(shipDeadline < currentTime){
+            await Invoice.update(
+              { orderStatus: 'cancel' },
+              { where: { id: el.id }, transaction: t }
+          );
+
+          const user = await User.findByPk(el.buyer.id)
+          if(!user.saldo){
+            await user.update({saldo: el.pendingAmount}, {transaction: t})
+          }else{
+            await user.update({saldo: (el.pendingAmount + user.saldo)}, {transaction: t})
+          }
+
+          await Invoice.update(
+            { paymentStatus: 'refund', pendingAmount: 0 },
+            { where: { id: el.id }, transaction: t}
+          );
+          return ;
+        };
+        
+        
+      })
+      )
+      await t.commit()
+      }
+    } catch (error) {
+      await t.rollback()
+      console.log(error)
+    }
+    
+
   }
 }
 

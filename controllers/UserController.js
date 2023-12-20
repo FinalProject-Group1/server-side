@@ -93,6 +93,7 @@ class UserController {
       const user = await User.findByPk(id, {
         include: {
           association: 'seller',
+          attributes: ['shopName'],
           include: [{
             model: OrderItem,
             include: {
@@ -104,7 +105,7 @@ class UserController {
           },
           {
             association: 'buyer'
-          },],
+          }],
         },
       });
 
@@ -120,7 +121,7 @@ class UserController {
       const user = await User.findByPk(id, {
         include: {
           association: 'buyer',
-          include: {
+          include: [{
             model: OrderItem,
             include: {
               association: 'sellerproduct',
@@ -129,7 +130,10 @@ class UserController {
               },
             },
           },
-        },
+          {
+            association: 'seller'
+          }],
+        }
       });
 
       res.status(200).json(user);
@@ -156,6 +160,7 @@ class UserController {
       next(error);
     }
   }
+
 }
 
 module.exports = UserController;

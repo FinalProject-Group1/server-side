@@ -17,7 +17,6 @@ route.get('/seller-products', SellerProductController.getAllSeller);
 route.use(authentication);
 route.get('/user/seller-products', UserController.mySellerProducts);
 route.get('/invoice/:id', InvoiceController.getInvoice);
-route.get('/products/:id', ProductController.getProductById);
 route.get('/invoices-seller', UserController.sellerInvoice);
 route.get('/invoices-buyer', UserController.buyerInvoice);
 route.get('/profile', UserController.profile);
@@ -28,6 +27,7 @@ route.post('/payment', authorizationBuyer, PaymentGate.getMidtransToken);
 route.post('/order', authorizationBuyer, InvoiceController.createInvoice);
 route.put('/seller-products/:id', authorizationEdit, SellerProductController.sellerEdit);
 route.put('/seller-order', InvoiceController.editInvoiceSeller);
+route.put('/seller-order-cancel', InvoiceController.editInvoiceCancelSeller);
 route.put('/buyer-order', InvoiceController.editInvoiceBuyer);
 
 route.use(error);
