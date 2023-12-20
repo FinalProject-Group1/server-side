@@ -11,14 +11,35 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Invoice.hasMany(models.OrderItem, {foreignKey: 'InvoiceId'})
+      Invoice.belongsTo(models.User, {foreignKey: 'SellerId', as : "seller"})
+      Invoice.belongsTo(models.User, {foreignKey: 'BuyerId', as : 'buyer'})
     }
   }
   Invoice.init({
     SellerId: DataTypes.INTEGER,
     BuyerId: DataTypes.INTEGER,
-    quantity: DataTypes.INTEGER,
-    orderStatus: DataTypes.STRING,
-    paymentStatus: DataTypes.STRING
+    orderStatus: {
+      type: DataTypes.STRING,
+      defaultValue: "progress"
+    },
+    paymentStatus: {
+      type: DataTypes.STRING,
+      defaultValue: "unpaid"
+    },
+    transactionToken: {
+      type: DataTypes.STRING
+    },
+    OrderId: {
+      type: DataTypes.STRING
+    },
+    pendingAmount: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+    expiredTransaction: {
+      type: DataTypes.DATE
+    },
   }, {
     sequelize,
     modelName: 'Invoice',

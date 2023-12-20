@@ -23,14 +23,23 @@ module.exports = {
           key: "id"
         }
       },
-      quantity: {
-        type: Sequelize.INTEGER
-      },
       orderStatus: {
         type: Sequelize.STRING
       },
       paymentStatus: {
         type: Sequelize.STRING
+      },
+      transactionToken: {
+        type: Sequelize.STRING
+      },
+      OrderId: {
+        type: Sequelize.STRING
+      },
+      pendingAmount: {
+        type: Sequelize.INTEGER
+      },
+      expiredTransaction: {
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,

@@ -16,8 +16,12 @@
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
+    "midtrans-client": "^1.3.1",
+    "nanoid": "^3.3.7",
     "pg": "^8.11.3",
-    "sequelize": "^6.35.2"
+    "qrcode-terminal": "^0.12.0",
+    "sequelize": "^6.35.2",
+    "whatsapp-web.js": "^1.23.0"
   },
   "devDependencies": {
     "dotenv": "^16.3.1",

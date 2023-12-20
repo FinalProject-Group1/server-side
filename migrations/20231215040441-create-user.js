@@ -19,6 +19,9 @@ module.exports = {
       address: {
         type: Sequelize.STRING
       },
+      city: {
+        type: Sequelize.STRING
+      },
       role: {
         type: Sequelize.STRING
       },
@@ -30,6 +33,9 @@ module.exports = {
       },
       shopName: {
         type: Sequelize.STRING
+      },
+      saldo: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
