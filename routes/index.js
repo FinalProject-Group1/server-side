@@ -17,7 +17,7 @@ route.get('/seller-products', SellerProductController.getAllSeller);
 route.get('/user/:id', UserController.getUserId);
 route.get('/products/:id', ProductController.getProductById);
 route.use(authentication);
-route.get('/user/seller-products', UserController.mySellerProducts);
+route.get('/users/seller-products', UserController.mySellerProducts);
 route.get('/invoice/:id', InvoiceController.getInvoice);
 route.get('/invoices-seller', UserController.sellerInvoice);
 route.get('/invoices-buyer', UserController.buyerInvoice);

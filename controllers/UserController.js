@@ -104,9 +104,9 @@ class UserController {
     try {
       const id = req.user.id;
       const user = await User.findByPk(id, {
+        attributes: ['shopName'],
         include: {
           association: 'seller',
-          attributes: ['shopName'],
           include: [{
             model: OrderItem,
             include: {
@@ -124,6 +124,7 @@ class UserController {
 
       res.status(200).json(user);
     } catch (error) {
+      console.log(error, "<< ini errorna")
       next(error);
     }
   }
@@ -170,6 +171,7 @@ class UserController {
 
       res.status(200).json(user);
     } catch (error) {
+      console.log(error, "<< ini errornya")
       next(error);
     }
   }
