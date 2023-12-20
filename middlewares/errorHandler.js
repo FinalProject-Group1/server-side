@@ -32,6 +32,10 @@ function errorHandler(error, req, res, next) {
             statCode = 400;
             message = ["Pesanan sudah dalam perjalanan"];
             break;
+        case "OnDelivery":
+            statCode = 400;
+            message = ["Pesanan sudah dalam perjalanan"];
+            break;
         case "OnShipping":
             statCode = 400;
             message = ["Pesanan belum diantar"];
