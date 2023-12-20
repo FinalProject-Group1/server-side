@@ -115,35 +115,34 @@ class UserController {
 		}
 	}
 
-	static async sellerInvoice(req, res, next) {
-		try {
-			const id = req.user.id;
-			const user = await User.findByPk(id, {
-				include: {
-					association: 'seller',
-					attributes: ['shopName'],
-					include: [
-						{
-							model: OrderItem,
-							include: {
-								association: 'sellerproduct',
-								include: {
-									association: 'product',
-								},
-							},
-						},
-						{
-							association: 'buyer',
-						},
-					],
-				},
-			});
+  static async sellerInvoice(req, res, next) {
+    try {
+      const id = req.user.id;
+      const user = await User.findByPk(id, {
+        attributes: ['shopName'],
+        include: {
+          association: 'seller',
+          include: [{
+            model: OrderItem,
+            include: {
+              association: 'sellerproduct',
+              include: {
+                association: 'product',
+              },
+            },
+          },
+          {
+            association: 'buyer'
+          }],
+        },
+      });
 
-			res.status(200).json(user);
-		} catch (error) {
-			next(error);
-		}
-	}
+      res.status(200).json(user);
+    } catch (error) {
+      console.log(error, "<< ini errorna")
+      next(error);
+    }
+  }
 
 	static async buyerInvoice(req, res, next) {
 		try {
@@ -181,11 +180,13 @@ class UserController {
 			// console.log(query);
 			const user = await User.findByPk(id, query);
 
-			res.status(200).json(user);
-		} catch (error) {
-			next(error);
-		}
-	}
+      res.status(200).json(user);
+    } catch (error) {
+      console.log(error, "<< ini errornya")
+      next(error);
+    }
+  }
+
 
 	static async mySellerProducts(req, res, next) {
 		try {
